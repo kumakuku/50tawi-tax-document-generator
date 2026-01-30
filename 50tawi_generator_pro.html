@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰國 50 Tawi 報稅文件批次產生器 Pro</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/4.1.7/signature_pad.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+            background: #f5f5f5;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Company Info Section */
+        .company-form {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Upload Section */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+            margin-bottom: 30px;
+        }
+        
+        .upload-area:hover {
+            background: #f0f2ff;
+            border-color: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        .upload-area.dragover {
+            background: #e8ebff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        /* Preview Section */
+        .preview-section {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .preview-section.show {
+            display: block;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .preview-info {
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Signature Pad */
+        .signature-section {
+            margin-top: 30px;
+        }
+        
+        .signature-container {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            background: white;
+            text-align: center;
+        }
+        
+        .signature-canvas {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: crosshair;
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .signature-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.3s;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Income Type Selector */
+        .income-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .income-type-card {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .income-type-card:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+        
+        .income-type-card.selected {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        
+        .income-type-card h4 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .income-type-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* PDF Preview */
+        .pdf-preview {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .pdf-preview.show {
+            display: block;
+        }
+        
+        /* Tax Document Template */
+        .tax-document {
+            background: white;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .doc-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .doc-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .doc-section {
+            margin-bottom: 25px;
+        }
+        
+        .doc-section-title {
+            font-weight: bold;
+            background: #f0f0f0;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .doc-field {
+            display: flex;
+            padding: 5px 0;
+        }
+        
+        .doc-field-label {
+            min-width: 200px;
+            font-weight: 600;
+        }
+        
+        .doc-field-value {
+            flex: 1;
+            border-bottom: 1px dotted #999;
+        }
+        
+        .signature-area {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .signature-box {
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 60px;
+            padding-top: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .signature-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .progress-container.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇹🇭 泰國 50 Tawi 報稅文件產生器 Pro</h1>
+            <p>批次產生專業 PDF 格式報稅文件 | PDF Generation | Digital Signature</p>
+        </div>
+        
+        <div class="content">
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('company')">📋 公司資訊</button>
+                <button class="tab" onclick="switchTab('upload')">📤 上傳資料</button>
+                <button class="tab" onclick="switchTab('signature')">✍️ 數位簽章</button>
+                <button class="tab" onclick="switchTab('generate')">🎯 產生文件</button>
+            </div>
+            
+            <!-- Status Message -->
+            <div id="statusMessage" class="status"></div>
+            
+            <!-- Tab 1: Company Info -->
+            <div id="companyTab" class="tab-content active">
+                <h2 style="margin-bottom: 20px;">公司基本資訊設定</h2>
+                <div class="company-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>公司名稱 (Company Name) *</label>
+                            <input type="text" id="companyName" placeholder="例如: ABC Corporation Ltd.">
+                        </div>
+                        <div class="form-group">
+                            <label>公司稅號 (Tax ID) *</label>
+                            <input type="text" id="companyTaxId" placeholder="0-1234-56789-01-2">
+                        </div>
+                        <div class="form-group">
+                            <label>公司地址 (Address) *</label>
+                            <textarea id="companyAddress" placeholder="例如: 123 Sukhumvit Road, Bangkok 10110"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>聯絡電話 (Phone)</label>
+                            <input type="text" id="companyPhone" placeholder="02-123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label>電子郵件 (Email)</label>
+                            <input type="email" id="companyEmail" placeholder="hr@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label>授權簽署人 (Authorized Person) *</label>
+                            <input type="text" id="authorizedPerson" placeholder="例如: John Smith">
+                        </div>
+                        <div class="form-group">
+                            <label>簽署人職位 (Position)</label>
+                            <input type="text" id="authorizedPosition" placeholder="例如: Managing Director">
+                        </div>
+                        <div class="form-group">
+                            <label>稅務年度 (Tax Year) *</label>
+                            <input type="text" id="taxYear" placeholder="2026" value="2026">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveCompanyInfo()" style="margin-top: 20px;">
+                        💾 儲存公司資訊
+                    </button>
+                </div>
+                
+                <h3 style="margin: 30px 0 15px 0;">收入類型設定</h3>
+                <p style="color: #666; margin-bottom: 20px;">選擇此次產生文件使用的預設收入類型</p>
+                <div class="income-types">
+                    <div class="income-type-card" onclick="selectIncomeType(1)">
+                        <h4>1️⃣ 薪資所得</h4>
+                        <p>Salary / เงินเดือน</p>
+                    </div>
+                    <div class="income-type-card" onclick="selectIncomeType(2)">
+                        <h4>2️⃣ 獎金紅利</h4>
+                        <p>Bonus / โบนัส</p>
+                    </div>
+                    <div class="income-type-card" onclick="selectIncomeType(3)">
+                        <h4>3️⃣ 加班費</h4>
+                        <p>Overtime / ค่าล่วงเวลา</p>
+                    </div>
+                    <div class="income-type-card" onclick="selectIncomeType(4)">
+                        <h4>4️⃣ 佣金</h4>
+                        <p>Commission / ค่าคอมมิชชั่น</p>
+                    </div>
+                    <div class="income-type-card" onclick="selectIncomeType(5)">
+                        <h4>5️⃣ 津貼補助</h4>
+                        <p>Allowance / เบี้ยเลี้ยง</p>
+                    </div>
+                    <div class="income-type-card" onclick="selectIncomeType(6)">
+                        <h4>6️⃣ 其他收入</h4>
+                        <p>Other Income / รายได้อื่นๆ</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 2: Upload Data -->
+            <div id="uploadTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">上傳員工資料 CSV</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">拖曳 CSV 檔案到這裡，或點擊選擇檔案</div>
+                    <div class="upload-hint">支援格式: .csv | 最大 10MB</div>
+                    <input type="file" id="fileInput" accept=".csv" onchange="handleFileSelect(event)">
+                </div>
+                
+                <div class="preview-section" id="previewSection">
+                    <div class="preview-header">
+                        <div class="preview-info">
+                            <strong>檔案名稱:</strong> <span id="fileName"></span><br>
+                            <strong>總筆數:</strong> <span id="recordCount"></span> 筆
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearData()">🗑️ 清除資料</button>
+                    </div>
+                    
+                    <h3>資料預覽 (前 10 筆)</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="previewTable">
+                            <thead id="tableHeader"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 3: Digital Signature -->
+            <div id="signatureTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">數位簽章設定</h2>
+                <p style="color: #666; margin-bottom: 30px;">請在下方簽名板上簽署您的簽名，此簽名將自動加入所有產生的文件中。</p>
+                
+                <div class="signature-section">
+                    <div class="signature-container">
+                        <h3>簽名板</h3>
+                        <canvas id="signatureCanvas" class="signature-canvas"></canvas>
+                        <div class="signature-controls">
+                            <button class="btn btn-secondary" onclick="clearSignature()">🗑️ 清除簽名</button>
+                            <button class="btn btn-primary" onclick="saveSignature()">💾 儲存簽名</button>
+                        </div>
+                        <p style="color: #999; margin-top: 15px; font-size: 0.9em;">
+                            提示: 使用滑鼠或觸控筆在簽名板上簽署
+                        </p>
+                    </div>
+                    
+                    <div id="signaturePreview" style="display:none; margin-top: 30px; text-align: center;">
+                        <h3>簽名預覽</h3>
+                        <img id="signatureImage" style="max-width: 300px; border: 2px solid #e0e0e0; border-radius: 10px; margin-top: 15px;">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 4: Generate Documents -->
+            <div id="generateTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">產生 PDF 文件</h2>
+                
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px;">📊 產生前檢查清單</h3>
+                    <div style="display: grid; gap: 10px;">
+                        <div id="checkCompany" style="padding: 10px; background: white; border-radius: 5px;">
+                            ⬜ 公司資訊已設定
+                        </div>
+                        <div id="checkData" style="padding: 10px; background: white; border-radius: 5px;">
+                            ⬜ CSV 資料已上傳
+                        </div>
+                        <div id="checkSignature" style="padding: 10px; background: white; border-radius: 5px;">
+                            ⬜ 數位簽章已設定 (選填)
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" id="generateBtn" onclick="generatePDFs()" style="font-size: 1.2em; padding: 20px 40px;" disabled>
+                        📄 批次產生 PDF 文件
+                    </button>
+                </div>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar">0%</div>
+                </div>
+                
+                <div id="generationLog" style="margin-top: 30px; display: none;">
+                    <h3>產生記錄</h3>
+                    <div id="logContent" style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin-top: 15px; max-height: 400px; overflow-y: auto; font-family: monospace;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let csvData = [];
+        let companyInfo = {};
+        let selectedIncomeType = 1;
+        let signaturePad;
+        let signatureDataURL = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSignaturePad();
+            loadSavedCompanyInfo();
+            checkReadiness();
+            
+            // Setup drag and drop
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.addEventListener('click', () => document.getElementById('fileInput').click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+        });
+        
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Company Info Functions
+        function saveCompanyInfo() {
+            companyInfo = {
+                name: document.getElementById('companyName').value,
+                taxId: document.getElementById('companyTaxId').value,
+                address: document.getElementById('companyAddress').value,
+                phone: document.getElementById('companyPhone').value,
+                email: document.getElementById('companyEmail').value,
+                authorizedPerson: document.getElementById('authorizedPerson').value,
+                authorizedPosition: document.getElementById('authorizedPosition').value,
+                taxYear: document.getElementById('taxYear').value
+            };
+            
+            // Validate required fields
+            if (!companyInfo.name || !companyInfo.taxId || !companyInfo.address || !companyInfo.authorizedPerson || !companyInfo.taxYear) {
+                showStatus('請填寫所有必填欄位 (標示 * 者)', 'error');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('companyInfo', JSON.stringify(companyInfo));
+            showStatus('✅ 公司資訊已儲存', 'success');
+            checkReadiness();
+        }
+        
+        function loadSavedCompanyInfo() {
+            const saved = localStorage.getItem('companyInfo');
+            if (saved) {
+                companyInfo = JSON.parse(saved);
+                document.getElementById('companyName').value = companyInfo.name || '';
+                document.getElementById('companyTaxId').value = companyInfo.taxId || '';
+                document.getElementById('companyAddress').value = companyInfo.address || '';
+                document.getElementById('companyPhone').value = companyInfo.phone || '';
+                document.getElementById('companyEmail').value = companyInfo.email || '';
+                document.getElementById('authorizedPerson').value = companyInfo.authorizedPerson || '';
+                document.getElementById('authorizedPosition').value = companyInfo.authorizedPosition || '';
+                document.getElementById('taxYear').value = companyInfo.taxYear || '2026';
+            }
+        }
+        
+        function selectIncomeType(type) {
+            selectedIncomeType = type;
+            document.querySelectorAll('.income-type-card').forEach(card => card.classList.remove('selected'));
+            event.target.closest('.income-type-card').classList.add('selected');
+            showStatus(`已選擇收入類型 ${type}`, 'info');
+        }
+        
+        // File Upload Functions
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+        
+        function processFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                showStatus('請上傳 CSV 格式檔案', 'error');
+                return;
+            }
+            
+            if (file.size > 10 * 1024 * 1024) {
+                showStatus('檔案大小超過 10MB 限制', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseCSV(e.target.result, file.name);
+            };
+            reader.readAsText(file);
+        }
+        
+        function parseCSV(text, fileName) {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) {
+                showStatus('CSV 檔案格式錯誤或無資料', 'error');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            csvData = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values.length === headers.length) {
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index];
+                    });
+                    csvData.push(row);
+                }
+            }
+            
+            if (csvData.length === 0) {
+                showStatus('CSV 檔案中沒有有效資料', 'error');
+                return;
+            }
+            
+            displayPreview(fileName, headers);
+            showStatus(`✅ 成功載入 ${csvData.length} 筆資料`, 'success');
+            checkReadiness();
+        }
+        
+        function displayPreview(fileName, headers) {
+            document.getElementById('fileName').textContent = fileName;
+            document.getElementById('recordCount').textContent = csvData.length;
+            
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            // Create header
+            tableHeader.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+            
+            // Create rows (first 10)
+            tableBody.innerHTML = '';
+            const preview = csvData.slice(0, 10);
+            preview.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = row[header] || '';
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+            
+            document.getElementById('previewSection').classList.add('show');
+        }
+        
+        function clearData() {
+            if (confirm('確定要清除已上傳的資料嗎？')) {
+                csvData = [];
+                document.getElementById('previewSection').classList.remove('show');
+                document.getElementById('fileInput').value = '';
+                showStatus('資料已清除', 'info');
+                checkReadiness();
+            }
+        }
+        
+        // Signature Functions
+        function initializeSignaturePad() {
+            const canvas = document.getElementById('signatureCanvas');
+            signaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)'
+            });
+            
+            // Resize canvas
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+        
+        function resizeCanvas() {
+            const canvas = document.getElementById('signatureCanvas');
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            signaturePad.clear();
+        }
+        
+        function clearSignature() {
+            signaturePad.clear();
+            signatureDataURL = null;
+            document.getElementById('signaturePreview').style.display = 'none';
+            checkReadiness();
+        }
+        
+        function saveSignature() {
+            if (signaturePad.isEmpty()) {
+                showStatus('請先簽署後再儲存', 'error');
+                return;
+            }
+            
+            signatureDataURL = signaturePad.toDataURL();
+            document.getElementById('signatureImage').src = signatureDataURL;
+            document.getElementById('signaturePreview').style.display = 'block';
+            showStatus('✅ 簽名已儲存', 'success');
+            checkReadiness();
+        }
+        
+        // PDF Generation Functions
+        async function generatePDFs() {
+            if (csvData.length === 0) {
+                showStatus('請先上傳 CSV 資料', 'error');
+                return;
+            }
+            
+            if (!companyInfo.name) {
+                showStatus('請先設定公司資訊', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 產生中...';
+            
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const logContainer = document.getElementById('generationLog');
+            const logContent = document.getElementById('logContent');
+            
+            progressContainer.classList.add('show');
+            logContainer.style.display = 'block';
+            logContent.innerHTML = '';
+            
+            const { jsPDF } = window.jspdf;
+            
+            for (let i = 0; i < csvData.length; i++) {
+                const employee = csvData[i];
+                const progress = Math.round(((i + 1) / csvData.length) * 100);
+                
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                
+                logContent.innerHTML += `[${i + 1}/${csvData.length}] 產生 ${employee.employee_name} 的文件...<br>`;
+                logContent.scrollTop = logContent.scrollHeight;
+                
+                await generateSinglePDF(employee, jsPDF);
+                
+                // Small delay to allow UI update
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '📄 批次產生 PDF 文件';
+            showStatus(`✅ 成功產生 ${csvData.length} 份 PDF 文件`, 'success');
+            logContent.innerHTML += `<br><strong>✅ 全部完成！共產生 ${csvData.length} 份文件</strong><br>`;
+        }
+        
+        async function generateSinglePDF(employee, jsPDF) {
+            const doc = new jsPDF();
+            
+            // Set font
+            doc.setFont('helvetica');
+            
+            // Header
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('THAILAND TAX WITHHOLDING CERTIFICATE', 105, 20, { align: 'center' });
+            doc.text('หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 Tawi)', 105, 28, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Tax Year: ${companyInfo.taxYear}`, 105, 35, { align: 'center' });
+            
+            // Company Information Section
+            let y = 45;
+            doc.setFont('helvetica', 'bold');
+            doc.text('PAYER INFORMATION / ข้อมูลผู้จ่ายเงิน', 20, y);
+            y += 8;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Company Name / ชื่อบริษัท: ${companyInfo.name}`, 20, y);
+            y += 6;
+            doc.text(`Tax ID / เลขประจำตัวผู้เสียภาษี: ${companyInfo.taxId}`, 20, y);
+            y += 6;
+            doc.text(`Address / ที่อยู่: ${companyInfo.address}`, 20, y);
+            y += 6;
+            if (companyInfo.phone) {
+                doc.text(`Phone / โทรศัพท์: ${companyInfo.phone}`, 20, y);
+                y += 6;
+            }
+            
+            // Employee Information Section
+            y += 5;
+            doc.setFont('helvetica', 'bold');
+            doc.text('PAYEE INFORMATION / ข้อมูลผู้รับเงิน', 20, y);
+            y += 8;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Name / ชื่อ: ${employee.employee_name || 'N/A'}`, 20, y);
+            y += 6;
+            doc.text(`Tax ID / เลขประจำตัวผู้เสียภาษี: ${employee.tax_id || 'N/A'}`, 20, y);
+            y += 6;
+            doc.text(`Personal ID / เลขบัตรประชาชน: ${employee.personal_id || 'N/A'}`, 20, y);
+            y += 6;
+            doc.text(`Address / ที่อยู่: ${employee.address || 'N/A'}`, 20, y);
+            
+            // Payment Information Section
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.text('PAYMENT DETAILS / รายละเอียดการจ่ายเงิน', 20, y);
+            y += 8;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Payment Date / วันที่จ่าย: ${employee.payment_date || 'N/A'}`, 20, y);
+            y += 6;
+            
+            const incomeTypes = {
+                1: 'Salary / เงินเดือน',
+                2: 'Bonus / โบนัส',
+                3: 'Overtime / ค่าล่วงเวลา',
+                4: 'Commission / ค่าคอมมิชชั่น',
+                5: 'Allowance / เบี้ยเลี้ยง',
+                6: 'Other Income / รายได้อื่นๆ'
+            };
+            
+            doc.text(`Income Type / ประเภทเงินได้: ${incomeTypes[selectedIncomeType] || employee.income_type}`, 20, y);
+            y += 6;
+            doc.text(`Amount Paid / จำนวนเงินที่จ่าย: ${parseFloat(employee.amount_paid || 0).toFixed(2)} THB`, 20, y);
+            y += 6;
+            doc.text(`Tax Withheld / ภาษีหัก ณ ที่จ่าย: ${parseFloat(employee.tax_withheld || 0).toFixed(2)} THB`, 20, y);
+            y += 6;
+            doc.text(`Social Security / ประกันสังคม: ${parseFloat(employee.social_security || 0).toFixed(2)} THB`, 20, y);
+            y += 6;
+            doc.text(`Provident Fund / กองทุนสำรองเลี้ยงชีพ: ${parseFloat(employee.provident_fund || 0).toFixed(2)} THB`, 20, y);
+            
+            // Calculation Summary
+            y += 10;
+            const totalIncome = parseFloat(employee.amount_paid || 0);
+            const totalDeductions = parseFloat(employee.social_security || 0) + parseFloat(employee.provident_fund || 0);
+            const netIncome = totalIncome - totalDeductions;
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('SUMMARY / สรุป', 20, y);
+            y += 8;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Total Income / รายได้รวม: ${totalIncome.toFixed(2)} THB`, 20, y);
+            y += 6;
+            doc.text(`Total Deductions / หักรวม: ${totalDeductions.toFixed(2)} THB`, 20, y);
+            y += 6;
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Net Income / รายได้สุทธิ: ${netIncome.toFixed(2)} THB`, 20, y);
+            
+            // Signature Section
+            y += 15;
+            doc.setFont('helvetica', 'bold');
+            doc.text('CERTIFICATION / การรับรอง', 20, y);
+            y += 8;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.text('I hereby certify that the information provided above is true and correct.', 20, y);
+            doc.text('ข้าพเจ้าขอรับรองว่าข้อมูลข้างต้นถูกต้องและเป็นจริง', 20, y + 5);
+            
+            y += 15;
+            
+            // Add signature if available
+            if (signatureDataURL) {
+                doc.addImage(signatureDataURL, 'PNG', 20, y, 50, 20);
+            }
+            
+            y += 25;
+            doc.line(20, y, 80, y);
+            doc.text(`${companyInfo.authorizedPerson}`, 20, y + 5);
+            doc.text(`${companyInfo.authorizedPosition || 'Authorized Person'}`, 20, y + 10);
+            doc.text(`Date: ${new Date().toLocaleDateString('th-TH')}`, 20, y + 15);
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text('This is a computer-generated document. No signature is required.', 105, 280, { align: 'center' });
+            doc.text('เอกสารนี้สร้างโดยคอมพิวเตอร์ ไม่จำเป็นต้องมีลายเซ็น', 105, 285, { align: 'center' });
+            
+            // Save PDF
+            const fileName = `50Tawi_${employee.employee_name}_${companyInfo.taxYear}.pdf`;
+            doc.save(fileName);
+        }
+        
+        // Check Readiness
+        function checkReadiness() {
+            const hasCompanyInfo = companyInfo.name && companyInfo.taxId && companyInfo.address && companyInfo.authorizedPerson;
+            const hasData = csvData.length > 0;
+            const hasSignature = signatureDataURL !== null;
+            
+            // Update checklist
+            document.getElementById('checkCompany').innerHTML = hasCompanyInfo ? 
+                '✅ 公司資訊已設定' : '⬜ 公司資訊已設定';
+            document.getElementById('checkData').innerHTML = hasData ? 
+                '✅ CSV 資料已上傳' : '⬜ CSV 資料已上傳';
+            document.getElementById('checkSignature').innerHTML = hasSignature ? 
+                '✅ 數位簽章已設定 (選填)' : '⬜ 數位簽章已設定 (選填)';
+            
+            // Enable/disable generate button
+            const generateBtn = document.getElementById('generateBtn');
+            if (hasCompanyInfo && hasData) {
+                generateBtn.disabled = false;
+            } else {
+                generateBtn.disabled = true;
+            }
+        }
+        
+        // Status Message
+        function showStatus(message, type) {
+            const status = document.getElementById('statusMessage');
+            status.textContent = message;
+            status.className = `status ${type} show`;
+            
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
