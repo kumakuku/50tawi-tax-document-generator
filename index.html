@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰國 50 Tawi 報稅文件批次產生器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .upload-section {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+        
+        .upload-section.dragover {
+            background: #f0f0ff;
+            border-color: #764ba2;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .upload-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .info-section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-section li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .info-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .generate-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .generate-btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+        
+        .generate-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .file-name {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇹🇭 泰國 50 Tawi 報稅文件批次產生器</h1>
+            <p>Withholding Tax Certificate Generator (Section 50 bis)</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-section">
+                <h3>📋 CSV 檔案格式要求</h3>
+                <ul>
+                    <li>員工姓名 (employee_name)</li>
+                    <li>稅務識別號碼 (tax_id)</li>
+                    <li>個人識別號碼 (personal_id)</li>
+                    <li>地址 (address)</li>
+                    <li>支付日期 (payment_date)</li>
+                    <li>收入類型 (income_type)</li>
+                    <li>支付金額 (amount_paid)</li>
+                    <li>扣繳稅額 (tax_withheld)</li>
+                    <li>社會保險金額 (social_security)</li>
+                    <li>公積金金額 (provident_fund)</li>
+                </ul>
+            </div>
+            
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-icon">📁</div>
+                <h3>拖曳 CSV 檔案至此處或點擊上傳</h3>
+                <p style="margin: 15px 0; color: #666;">支援 .csv 格式</p>
+                <input type="file" id="fileInput" class="file-input" accept=".csv">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    選擇檔案
+                </button>
+                <div class="file-name" id="fileName"></div>
+            </div>
+            
+            <div class="preview-section" id="previewSection">
+                <h3 style="margin-bottom: 20px; color: #667eea;">📊 資料預覽</h3>
+                <div class="table-container">
+                    <table id="previewTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <button class="generate-btn" id="generateBtn">
+                    🚀 批次產生 50 Tawi 文件
+                </button>
+            </div>
+            
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        let csvData = [];
+        const fileInput = document.getElementById('fileInput');
+        const uploadSection = document.getElementById('uploadSection');
+        const previewSection = document.getElementById('previewSection');
+        const fileName = document.getElementById('fileName');
+        const generateBtn = document.getElementById('generateBtn');
+        const status = document.getElementById('status');
+        
+        // 拖放功能
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+        
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+        
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                showStatus('請上傳 CSV 格式的檔案', 'error');
+                return;
+            }
+            
+            fileName.textContent = `已選擇：${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseCSV(text);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+        
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                showStatus('CSV 檔案格式錯誤或資料不足', 'error');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            csvData = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                csvData.push(row);
+            }
+            
+            displayPreview(headers, csvData);
+        }
+        
+        function displayPreview(headers, data) {
+            const tableHead = document.getElementById('tableHead');
+            const tableBody = document.getElementById('tableBody');
+            
+            // 顯示表頭
+            tableHead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+            
+            // 顯示資料（最多顯示前 10 筆）
+            const displayData = data.slice(0, 10);
+            tableBody.innerHTML = displayData.map(row => 
+                '<tr>' + headers.map(h => `<td>${row[h]}</td>`).join('') + '</tr>'
+            ).join('');
+            
+            previewSection.style.display = 'block';
+            if (data.length > 10) {
+                showStatus(`已載入 ${data.length} 筆資料，預覽顯示前 10 筆`, 'success');
+            } else {
+                showStatus(`已載入 ${data.length} 筆資料`, 'success');
+            }
+        }
+        
+        generateBtn.addEventListener('click', () => {
+            if (csvData.length === 0) {
+                showStatus('請先上傳 CSV 檔案', 'error');
+                return;
+            }
+            
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ 產生中...';
+            
+            // 模擬產生文件
+            setTimeout(() => {
+                generate50TawiDocuments();
+            }, 1000);
+        });
+        
+        function generate50TawiDocuments() {
+            try {
+                // 產生 PDF 文件（這裡使用簡化版，實際應用需要使用 PDF 庫）
+                const pdfContent = csvData.map((row, index) => {
+                    return generateSingle50Tawi(row, index + 1);
+                }).join('\n\n' + '='.repeat(80) + '\n\n');
+                
+                // 下載為文字檔（實際應用應產生 PDF）
+                downloadFile(pdfContent, '50_Tawi_Documents.txt');
+                
+                showStatus(`✅ 成功產生 ${csvData.length} 份 50 Tawi 文件！`, 'success');
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🚀 批次產生 50 Tawi 文件';
+            } catch (error) {
+                showStatus('產生文件時發生錯誤：' + error.message, 'error');
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🚀 批次產生 50 Tawi 文件';
+            }
+        }
+        
+        function generateSingle50Tawi(data, number) {
+            return `
+╔════════════════════════════════════════════════════════════════════════════╗
+║          WITHHOLDING TAX CERTIFICATE (Section 50 Bis)                      ║
+║              หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+Certificate No: 50TAWI-${String(number).padStart(6, '0')}
+Date Issued: ${new Date().toLocaleDateString('th-TH')}
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PAYER INFORMATION (ผู้จ่ายเงิน):
+  Company Name: [YOUR COMPANY NAME]
+  Tax ID: [YOUR COMPANY TAX ID]
+  Address: [YOUR COMPANY ADDRESS]
+
+PAYEE INFORMATION (ผู้รับเงิน):
+  Name: ${data.employee_name || 'N/A'}
+  Tax Identification No: ${data.tax_id || 'N/A'}
+  Personal Identification No: ${data.personal_id || 'N/A'}
+  Address: ${data.address || 'N/A'}
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INCOME DETAILS (รายละเอียดรายได้):
+  Type of Income: ${data.income_type || '1. Salary, wage, pension, etc. (Section 40(1))'}
+  Date Paid: ${data.payment_date || 'N/A'}
+  
+PAYMENT BREAKDOWN (รายละเอียดการจ่าย):
+  Amount Paid: ${parseFloat(data.amount_paid || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
+  Tax Withheld: ${parseFloat(data.tax_withheld || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
+  
+DEDUCTIONS (รายการหัก):
+  Social Security Fund: ${parseFloat(data.social_security || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
+  Provident Fund: ${parseFloat(data.provident_fund || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TOTAL TAX WITHHELD: ${parseFloat(data.tax_withheld || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CERTIFICATION:
+I hereby certify that the particulars given above are true.
+
+Signature: _______________________
+Position: _______________________
+Date: ${new Date().toLocaleDateString('th-TH')}
+
+                                                            [CORPORATE SEAL]
+
+═══════════════════════════════════════════════════════════════════════════════
+COPIES:
+  Copy 1: To be attached with income receiver's tax return
+  Copy 2: To be kept by income receiver as reference
+  Copy 3: To be kept by income payer
+
+WARNING: The person liable to issue a withholding tax certificate fails to 
+comply with Section 50 Bis of the Revenue Code shall be subject to criminal 
+charges under Section 35 of the Revenue Code.
+`;
+        }
+        
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+        
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = 'status ' + type;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
