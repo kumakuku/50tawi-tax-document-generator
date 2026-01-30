@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>泰國 50 Tawi 報稅文件批次產生器</title>
+    <title>🇹🇭 Thailand 50 Tawi Tax Document Generator Pro</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/4.1.7/signature_pad.umd.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -24,453 +30,884 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+            padding: 40px;
         }
         
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
             text-align: center;
+            margin-bottom: 40px;
         }
         
         .header h1 {
-            font-size: 28px;
+            color: #667eea;
+            font-size: 2.5em;
             margin-bottom: 10px;
         }
         
         .header p {
-            font-size: 14px;
-            opacity: 0.9;
+            color: #666;
+            font-size: 1.1em;
         }
         
-        .content {
-            padding: 40px;
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
         }
         
-        .upload-section {
+        .section-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .upload-area {
             border: 3px dashed #667eea;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 40px;
             text-align: center;
-            margin-bottom: 30px;
+            cursor: pointer;
             transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .upload-section:hover {
-            border-color: #764ba2;
-            background: #f8f9ff;
-        }
-        
-        .upload-section.dragover {
-            background: #f0f0ff;
-            border-color: #764ba2;
-        }
-        
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .upload-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .upload-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .info-section {
-            background: #f8f9ff;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .info-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .info-section ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .info-section li {
-            padding: 8px 0;
-            padding-left: 25px;
-            position: relative;
-        }
-        
-        .info-section li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-        }
-        
-        .preview-section {
-            display: none;
-            margin-top: 30px;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
             background: white;
         }
         
-        th {
+        .upload-area:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        .upload-area.dragover {
+            background: #e8edff;
+            border-color: #4c5fd7;
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .preview-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
             text-align: left;
             font-weight: 600;
         }
         
-        td {
-            padding: 12px 15px;
+        .preview-table td {
+            padding: 12px;
             border-bottom: 1px solid #e0e0e0;
         }
         
-        tr:hover {
-            background: #f8f9ff;
+        .preview-table tr:hover {
+            background: #f8f9fa;
         }
         
-        .generate-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 15px 50px;
-            font-size: 18px;
-            border-radius: 30px;
-            cursor: pointer;
+        .signature-container {
             margin-top: 20px;
-            transition: all 0.3s;
+        }
+        
+        #signaturePad {
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: crosshair;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+            width: 100%;
+            max-width: 500px;
+            height: 200px;
+            margin: 0 auto;
         }
         
-        .generate-btn:hover {
-            background: #059669;
-            transform: scale(1.05);
-        }
-        
-        .generate-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: scale(1);
-        }
-        
-        .status {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
             display: none;
         }
         
-        .status.success {
-            background: #d1fae5;
-            color: #065f46;
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
         }
         
-        .status.error {
-            background: #fee2e2;
-            color: #991b1b;
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
         }
         
-        .file-name {
-            margin-top: 15px;
-            font-weight: bold;
-            color: #667eea;
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .document-preview {
+            background: white;
+            padding: 40px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .document-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 20px;
+        }
+        
+        .document-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .document-subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🇹🇭 泰國 50 Tawi 報稅文件批次產生器</h1>
-            <p>Withholding Tax Certificate Generator (Section 50 bis)</p>
+            <h1>🇹🇭 Thailand 50 Tawi Tax Document Generator Pro</h1>
+            <p>หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ) - Professional Edition</p>
         </div>
         
-        <div class="content">
-            <div class="info-section">
-                <h3>📋 CSV 檔案格式要求</h3>
-                <ul>
-                    <li>員工姓名 (employee_name)</li>
-                    <li>稅務識別號碼 (tax_id)</li>
-                    <li>個人識別號碼 (personal_id)</li>
-                    <li>地址 (address)</li>
-                    <li>支付日期 (payment_date)</li>
-                    <li>收入類型 (income_type)</li>
-                    <li>支付金額 (amount_paid)</li>
-                    <li>扣繳稅額 (tax_withheld)</li>
-                    <li>社會保險金額 (social_security)</li>
-                    <li>公積金金額 (provident_fund)</li>
-                </ul>
+        <!-- Company Information Section -->
+        <div class="section">
+            <div class="section-title">
+                <span>🏢</span>
+                <span>ข้อมูลบริษัท / Company Information</span>
             </div>
-            
-            <div class="upload-section" id="uploadSection">
-                <div class="upload-icon">📁</div>
-                <h3>拖曳 CSV 檔案至此處或點擊上傳</h3>
-                <p style="margin: 15px 0; color: #666;">支援 .csv 格式</p>
-                <input type="file" id="fileInput" class="file-input" accept=".csv">
-                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                    選擇檔案
-                </button>
-                <div class="file-name" id="fileName"></div>
-            </div>
-            
-            <div class="preview-section" id="previewSection">
-                <h3 style="margin-bottom: 20px; color: #667eea;">📊 資料預覽</h3>
-                <div class="table-container">
-                    <table id="previewTable">
-                        <thead id="tableHead"></thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>ชื่อบริษัท / Company Name *</label>
+                    <input type="text" id="companyName" placeholder="ABC Company Limited" required>
                 </div>
-                <button class="generate-btn" id="generateBtn">
-                    🚀 批次產生 50 Tawi 文件
+                <div class="form-group">
+                    <label>เลขประจำตัวผู้เสียภาษี / Tax ID *</label>
+                    <input type="text" id="companyTaxId" placeholder="0123456789012" maxlength="13" required>
+                </div>
+                <div class="form-group">
+                    <label>ที่อยู่ / Address *</label>
+                    <textarea id="companyAddress" rows="2" placeholder="123 Business Road, Bangkok 10110" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทร / Phone</label>
+                    <input type="tel" id="companyPhone" placeholder="02-123-4567">
+                </div>
+                <div class="form-group">
+                    <label>อีเมล / Email</label>
+                    <input type="email" id="companyEmail" placeholder="contact@company.com">
+                </div>
+            </div>
+            <div class="button-group" style="margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="saveCompanyInfo()">
+                    💾 บันทึกข้อมูลบริษัท / Save Company Info
+                </button>
+                <button class="btn btn-secondary" onclick="loadCompanyInfo()">
+                    📂 โหลดข้อมูลบริษัท / Load Company Info
                 </button>
             </div>
-            
-            <div class="status" id="status"></div>
         </div>
+        
+        <!-- Income Type Selection -->
+        <div class="section">
+            <div class="section-title">
+                <span>💰</span>
+                <span>ประเภทเงินได้ / Income Type</span>
+            </div>
+            <div class="form-group">
+                <label>เลือกประเภทเงินได้ / Select Income Type *</label>
+                <select id="incomeType" required>
+                    <option value="">-- เลือกประเภท / Select Type --</option>
+                    <option value="1">1. เงินเดือน ค่าจ้าง / Salary & Wages</option>
+                    <option value="2">2. ค่าธรรมเนียม ค่านายหน้า / Fee, Commission</option>
+                    <option value="3">3. ค่าแห่งลิขสิทธิ์ / Royalty</option>
+                    <option value="4">4. ดอกเบี้ย เงินปันผล / Interest, Dividend</option>
+                    <option value="5">5. ค่าเช่าทรัพย์สิน / Rental Income</option>
+                    <option value="6">6. รางวัล ส่วนลด / Prize, Discount</option>
+                    <option value="7">7. รับเหมาก่อสร้าง / Construction Contract</option>
+                    <option value="8">8. รายได้อื่นๆ / Other Income</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Digital Signature Section -->
+        <div class="section">
+            <div class="section-title">
+                <span>✍️</span>
+                <span>ลายเซ็นดิจิทัล / Digital Signature</span>
+            </div>
+            <div class="signature-container">
+                <canvas id="signaturePad"></canvas>
+                <div class="button-group" style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="clearSignature()">
+                        🗑️ ล้างลายเซ็น / Clear
+                    </button>
+                    <button class="btn btn-secondary" onclick="saveSignature()">
+                        💾 บันทึกลายเซ็น / Save
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CSV Upload Section -->
+        <div class="section">
+            <div class="section-title">
+                <span>📤</span>
+                <span>อัปโหลดไฟล์ CSV / Upload CSV File</span>
+            </div>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3>ลากไฟล์ CSV มาวางที่นี่</h3>
+                <p>หรือคลิกเพื่อเลือกไฟล์</p>
+                <p style="color: #888; font-size: 0.9em; margin-top: 10px;">
+                    รองรับ: .csv (UTF-8 encoding)
+                </p>
+            </div>
+            <input type="file" id="fileInput" accept=".csv" onchange="handleFileSelect(event)">
+        </div>
+        
+        <!-- Alert Messages -->
+        <div id="alertSuccess" class="alert alert-success"></div>
+        <div id="alertError" class="alert alert-error"></div>
+        <div id="alertInfo" class="alert alert-info"></div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill">0%</div>
+        </div>
+        
+        <!-- Data Preview Section -->
+        <div class="section hidden" id="previewSection">
+            <div class="section-title">
+                <span>👁️</span>
+                <span>ดูตัวอย่างข้อมูล / Data Preview</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="preview-table" id="previewTable">
+                    <thead>
+                        <tr>
+                            <th>ชื่อ-นามสกุล / Name</th>
+                            <th>เลขประจำตัว / Tax ID</th>
+                            <th>ที่อยู่ / Address</th>
+                            <th>เงินได้ / Income</th>
+                            <th>ภาษีหัก / Tax Withheld</th>
+                        </tr>
+                    </thead>
+                    <tbody id="previewBody"></tbody>
+                </table>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-success" onclick="generateAllDocuments()">
+                    📄 สร้าง PDF ทั้งหมด / Generate All PDFs
+                </button>
+                <button class="btn btn-primary" onclick="generateSinglePDF()">
+                    📝 ทดสอบ PDF (คนแรก) / Test First PDF
+                </button>
+            </div>
+        </div>
+        
+        <!-- Document Preview Section (Hidden by default) -->
+        <div id="documentPreview" class="hidden"></div>
     </div>
 
     <script>
+        // Initialize Signature Pad
+        const canvas = document.getElementById('signaturePad');
+        const signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgb(255, 255, 255)',
+            penColor: 'rgb(0, 0, 0)'
+        });
+        
+        // Resize canvas
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+        }
+        
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        
         let csvData = [];
+        let savedSignature = null;
+        
+        // Drag and Drop
+        const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const uploadSection = document.getElementById('uploadSection');
-        const previewSection = document.getElementById('previewSection');
-        const fileName = document.getElementById('fileName');
-        const generateBtn = document.getElementById('generateBtn');
-        const status = document.getElementById('status');
         
-        // 拖放功能
-        uploadSection.addEventListener('dragover', (e) => {
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadSection.classList.add('dragover');
+            uploadArea.classList.add('dragover');
         });
         
-        uploadSection.addEventListener('dragleave', () => {
-            uploadSection.classList.remove('dragover');
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
         });
         
-        uploadSection.addEventListener('drop', (e) => {
+        uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadSection.classList.remove('dragover');
+            uploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 handleFile(files[0]);
             }
         });
         
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
             }
-        });
+        }
         
         function handleFile(file) {
             if (!file.name.endsWith('.csv')) {
-                showStatus('請上傳 CSV 格式的檔案', 'error');
+                showAlert('error', '❌ กรุณาเลือกไฟล์ CSV / Please select a CSV file');
                 return;
             }
             
-            fileName.textContent = `已選擇：${file.name}`;
-            
             const reader = new FileReader();
             reader.onload = function(e) {
-                const text = e.target.result;
-                parseCSV(text);
+                try {
+                    parseCSV(e.target.result);
+                    showAlert('success', `✅ อ่านไฟล์สำเร็จ! พบข้อมูล ${csvData.length} รายการ / File loaded successfully! Found ${csvData.length} records`);
+                    showPreview();
+                } catch (error) {
+                    showAlert('error', '❌ ไม่สามารถอ่านไฟล์ได้ / Error reading file: ' + error.message);
+                }
             };
             reader.readAsText(file, 'UTF-8');
         }
         
         function parseCSV(text) {
             const lines = text.split('\n').filter(line => line.trim());
-            if (lines.length < 2) {
-                showStatus('CSV 檔案格式錯誤或資料不足', 'error');
-                return;
-            }
-            
             const headers = lines[0].split(',').map(h => h.trim());
-            csvData = [];
             
+            csvData = [];
             for (let i = 1; i < lines.length; i++) {
                 const values = lines[i].split(',').map(v => v.trim());
-                const row = {};
-                headers.forEach((header, index) => {
-                    row[header] = values[index] || '';
-                });
-                csvData.push(row);
-            }
-            
-            displayPreview(headers, csvData);
-        }
-        
-        function displayPreview(headers, data) {
-            const tableHead = document.getElementById('tableHead');
-            const tableBody = document.getElementById('tableBody');
-            
-            // 顯示表頭
-            tableHead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
-            
-            // 顯示資料（最多顯示前 10 筆）
-            const displayData = data.slice(0, 10);
-            tableBody.innerHTML = displayData.map(row => 
-                '<tr>' + headers.map(h => `<td>${row[h]}</td>`).join('') + '</tr>'
-            ).join('');
-            
-            previewSection.style.display = 'block';
-            if (data.length > 10) {
-                showStatus(`已載入 ${data.length} 筆資料，預覽顯示前 10 筆`, 'success');
-            } else {
-                showStatus(`已載入 ${data.length} 筆資料`, 'success');
+                if (values.length >= 5) {
+                    csvData.push({
+                        name: values[0],
+                        taxId: values[1],
+                        address: values[2],
+                        income: parseFloat(values[3]) || 0,
+                        taxWithheld: parseFloat(values[4]) || 0
+                    });
+                }
             }
         }
         
-        generateBtn.addEventListener('click', () => {
-            if (csvData.length === 0) {
-                showStatus('請先上傳 CSV 檔案', 'error');
+        function showPreview() {
+            const previewSection = document.getElementById('previewSection');
+            const previewBody = document.getElementById('previewBody');
+            
+            previewBody.innerHTML = '';
+            csvData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.name}</td>
+                    <td>${row.taxId}</td>
+                    <td>${row.address}</td>
+                    <td>${formatCurrency(row.income)}</td>
+                    <td>${formatCurrency(row.taxWithheld)}</td>
+                `;
+                previewBody.appendChild(tr);
+            });
+            
+            previewSection.classList.remove('hidden');
+        }
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('th-TH', {
+                style: 'currency',
+                currency: 'THB'
+            }).format(amount);
+        }
+        
+        function showAlert(type, message) {
+            const alertId = type === 'success' ? 'alertSuccess' : 
+                           type === 'error' ? 'alertError' : 'alertInfo';
+            const alert = document.getElementById(alertId);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        function clearSignature() {
+            signaturePad.clear();
+            savedSignature = null;
+        }
+        
+        function saveSignature() {
+            if (signaturePad.isEmpty()) {
+                showAlert('error', '❌ กรุณาเซ็นชื่อก่อน / Please sign first');
+                return;
+            }
+            savedSignature = signaturePad.toDataURL();
+            showAlert('success', '✅ บันทึกลายเซ็นแล้ว / Signature saved');
+        }
+        
+        function saveCompanyInfo() {
+            const companyInfo = {
+                name: document.getElementById('companyName').value,
+                taxId: document.getElementById('companyTaxId').value,
+                address: document.getElementById('companyAddress').value,
+                phone: document.getElementById('companyPhone').value,
+                email: document.getElementById('companyEmail').value
+            };
+            
+            if (!companyInfo.name || !companyInfo.taxId || !companyInfo.address) {
+                showAlert('error', '❌ กรุณากรอกข้อมูลที่จำเป็น / Please fill required fields');
                 return;
             }
             
-            generateBtn.disabled = true;
-            generateBtn.textContent = '⏳ 產生中...';
-            
-            // 模擬產生文件
-            setTimeout(() => {
-                generate50TawiDocuments();
-            }, 1000);
-        });
+            localStorage.setItem('companyInfo', JSON.stringify(companyInfo));
+            showAlert('success', '✅ บันทึกข้อมูลบริษัทแล้ว / Company info saved');
+        }
         
-        function generate50TawiDocuments() {
-            try {
-                // 產生 PDF 文件（這裡使用簡化版，實際應用需要使用 PDF 庫）
-                const pdfContent = csvData.map((row, index) => {
-                    return generateSingle50Tawi(row, index + 1);
-                }).join('\n\n' + '='.repeat(80) + '\n\n');
-                
-                // 下載為文字檔（實際應用應產生 PDF）
-                downloadFile(pdfContent, '50_Tawi_Documents.txt');
-                
-                showStatus(`✅ 成功產生 ${csvData.length} 份 50 Tawi 文件！`, 'success');
-                generateBtn.disabled = false;
-                generateBtn.textContent = '🚀 批次產生 50 Tawi 文件';
-            } catch (error) {
-                showStatus('產生文件時發生錯誤：' + error.message, 'error');
-                generateBtn.disabled = false;
-                generateBtn.textContent = '🚀 批次產生 50 Tawi 文件';
+        function loadCompanyInfo() {
+            const saved = localStorage.getItem('companyInfo');
+            if (saved) {
+                const companyInfo = JSON.parse(saved);
+                document.getElementById('companyName').value = companyInfo.name || '';
+                document.getElementById('companyTaxId').value = companyInfo.taxId || '';
+                document.getElementById('companyAddress').value = companyInfo.address || '';
+                document.getElementById('companyPhone').value = companyInfo.phone || '';
+                document.getElementById('companyEmail').value = companyInfo.email || '';
+                showAlert('success', '✅ โหลดข้อมูลบริษัทแล้ว / Company info loaded');
+            } else {
+                showAlert('info', 'ℹ️ ไม่พบข้อมูลที่บันทึกไว้ / No saved data found');
             }
         }
         
-        function generateSingle50Tawi(data, number) {
-            return `
-╔════════════════════════════════════════════════════════════════════════════╗
-║          WITHHOLDING TAX CERTIFICATE (Section 50 Bis)                      ║
-║              หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)                    ║
-╚════════════════════════════════════════════════════════════════════════════╝
-
-Certificate No: 50TAWI-${String(number).padStart(6, '0')}
-Date Issued: ${new Date().toLocaleDateString('th-TH')}
-
-═══════════════════════════════════════════════════════════════════════════════
-
-PAYER INFORMATION (ผู้จ่ายเงิน):
-  Company Name: [YOUR COMPANY NAME]
-  Tax ID: [YOUR COMPANY TAX ID]
-  Address: [YOUR COMPANY ADDRESS]
-
-PAYEE INFORMATION (ผู้รับเงิน):
-  Name: ${data.employee_name || 'N/A'}
-  Tax Identification No: ${data.tax_id || 'N/A'}
-  Personal Identification No: ${data.personal_id || 'N/A'}
-  Address: ${data.address || 'N/A'}
-
-═══════════════════════════════════════════════════════════════════════════════
-
-INCOME DETAILS (รายละเอียดรายได้):
-  Type of Income: ${data.income_type || '1. Salary, wage, pension, etc. (Section 40(1))'}
-  Date Paid: ${data.payment_date || 'N/A'}
-  
-PAYMENT BREAKDOWN (รายละเอียดการจ่าย):
-  Amount Paid: ${parseFloat(data.amount_paid || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
-  Tax Withheld: ${parseFloat(data.tax_withheld || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
-  
-DEDUCTIONS (รายการหัก):
-  Social Security Fund: ${parseFloat(data.social_security || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
-  Provident Fund: ${parseFloat(data.provident_fund || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
-
-═══════════════════════════════════════════════════════════════════════════════
-
-TOTAL TAX WITHHELD: ${parseFloat(data.tax_withheld || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})} THB
-
-═══════════════════════════════════════════════════════════════════════════════
-
-CERTIFICATION:
-I hereby certify that the particulars given above are true.
-
-Signature: _______________________
-Position: _______________________
-Date: ${new Date().toLocaleDateString('th-TH')}
-
-                                                            [CORPORATE SEAL]
-
-═══════════════════════════════════════════════════════════════════════════════
-COPIES:
-  Copy 1: To be attached with income receiver's tax return
-  Copy 2: To be kept by income receiver as reference
-  Copy 3: To be kept by income payer
-
-WARNING: The person liable to issue a withholding tax certificate fails to 
-comply with Section 50 Bis of the Revenue Code shall be subject to criminal 
-charges under Section 35 of the Revenue Code.
-`;
-        }
-        
-        function downloadFile(content, filename) {
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        }
-        
-        function showStatus(message, type) {
-            status.textContent = message;
-            status.className = 'status ' + type;
-            status.style.display = 'block';
+        function validateInputs() {
+            const companyName = document.getElementById('companyName').value;
+            const companyTaxId = document.getElementById('companyTaxId').value;
+            const companyAddress = document.getElementById('companyAddress').value;
+            const incomeType = document.getElementById('incomeType').value;
             
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 5000);
+            if (!companyName || !companyTaxId || !companyAddress) {
+                showAlert('error', '❌ กรุณากรอกข้อมูลบริษัทให้ครบ / Please fill all company information');
+                return false;
+            }
+            
+            if (!incomeType) {
+                showAlert('error', '❌ กรุณาเลือกประเภทเงินได้ / Please select income type');
+                return false;
+            }
+            
+            if (csvData.length === 0) {
+                showAlert('error', '❌ กรุณาอัปโหลดไฟล์ CSV / Please upload CSV file');
+                return false;
+            }
+            
+            return true;
         }
+        
+        async function generateSinglePDF() {
+            if (!validateInputs()) return;
+            
+            showAlert('info', '⏳ กำลังสร้าง PDF ทดสอบ... / Generating test PDF...');
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const employee = csvData[0];
+                const companyName = document.getElementById('companyName').value;
+                const companyTaxId = document.getElementById('companyTaxId').value;
+                const companyAddress = document.getElementById('companyAddress').value;
+                const incomeType = document.getElementById('incomeType').value;
+                const incomeTypeText = document.getElementById('incomeType').options[document.getElementById('incomeType').selectedIndex].text;
+                
+                // Create document content
+                let yPos = 20;
+                
+                // Header
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                doc.text('TAX WITHHOLDING CERTIFICATE', 105, yPos, { align: 'center' });
+                yPos += 10;
+                doc.setFontSize(16);
+                doc.text('(Section 50 Bis)', 105, yPos, { align: 'center' });
+                yPos += 15;
+                
+                // Company Info
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('PAYER INFORMATION:', 20, yPos);
+                yPos += 8;
+                doc.setFont(undefined, 'normal');
+                doc.text(`Company: ${companyName}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Tax ID: ${companyTaxId}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Address: ${companyAddress}`, 20, yPos);
+                yPos += 12;
+                
+                // Employee Info
+                doc.setFont(undefined, 'bold');
+                doc.text('PAYEE INFORMATION:', 20, yPos);
+                yPos += 8;
+                doc.setFont(undefined, 'normal');
+                doc.text(`Name: ${employee.name}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Tax ID: ${employee.taxId}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Address: ${employee.address}`, 20, yPos);
+                yPos += 12;
+                
+                // Income Details
+                doc.setFont(undefined, 'bold');
+                doc.text('INCOME DETAILS:', 20, yPos);
+                yPos += 8;
+                doc.setFont(undefined, 'normal');
+                doc.text(`Income Type: ${incomeTypeText}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Income Amount: ${formatCurrency(employee.income)}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Tax Withheld: ${formatCurrency(employee.taxWithheld)}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Tax Rate: ${((employee.taxWithheld / employee.income) * 100).toFixed(2)}%`, 20, yPos);
+                yPos += 15;
+                
+                // Date
+                const today = new Date().toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                doc.text(`Issue Date: ${today}`, 20, yPos);
+                yPos += 15;
+                
+                // Signature
+                if (savedSignature) {
+                    doc.addImage(savedSignature, 'PNG', 20, yPos, 50, 20);
+                    yPos += 22;
+                }
+                doc.text('_________________________', 20, yPos);
+                yPos += 6;
+                doc.text('Authorized Signature', 20, yPos);
+                
+                // Save PDF
+                doc.save(`50Tawi_${employee.name.replace(/\s+/g, '_')}_Test.pdf`);
+                showAlert('success', '✅ สร้าง PDF ทดสอบสำเร็จ! / Test PDF generated successfully!');
+                
+            } catch (error) {
+                showAlert('error', '❌ เกิดข้อผิดพลาด / Error: ' + error.message);
+                console.error(error);
+            }
+        }
+        
+        async function generateAllDocuments() {
+            if (!validateInputs()) return;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            
+            showAlert('info', `⏳ กำลังสร้าง PDF ทั้งหมด ${csvData.length} ไฟล์... / Generating ${csvData.length} PDFs...`);
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const companyName = document.getElementById('companyName').value;
+                const companyTaxId = document.getElementById('companyTaxId').value;
+                const companyAddress = document.getElementById('companyAddress').value;
+                const incomeType = document.getElementById('incomeType').value;
+                const incomeTypeText = document.getElementById('incomeType').options[document.getElementById('incomeType').selectedIndex].text;
+                
+                for (let i = 0; i < csvData.length; i++) {
+                    const employee = csvData[i];
+                    const doc = new jsPDF();
+                    
+                    // Create document content (same as single PDF)
+                    let yPos = 20;
+                    
+                    doc.setFontSize(18);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('TAX WITHHOLDING CERTIFICATE', 105, yPos, { align: 'center' });
+                    yPos += 10;
+                    doc.setFontSize(16);
+                    doc.text('(Section 50 Bis)', 105, yPos, { align: 'center' });
+                    yPos += 15;
+                    
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('PAYER INFORMATION:', 20, yPos);
+                    yPos += 8;
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Company: ${companyName}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Tax ID: ${companyTaxId}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Address: ${companyAddress}`, 20, yPos);
+                    yPos += 12;
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text('PAYEE INFORMATION:', 20, yPos);
+                    yPos += 8;
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Name: ${employee.name}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Tax ID: ${employee.taxId}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Address: ${employee.address}`, 20, yPos);
+                    yPos += 12;
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text('INCOME DETAILS:', 20, yPos);
+                    yPos += 8;
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Income Type: ${incomeTypeText}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Income Amount: ${formatCurrency(employee.income)}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Tax Withheld: ${formatCurrency(employee.taxWithheld)}`, 20, yPos);
+                    yPos += 6;
+                    doc.text(`Tax Rate: ${((employee.taxWithheld / employee.income) * 100).toFixed(2)}%`, 20, yPos);
+                    yPos += 15;
+                    
+                    const today = new Date().toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    doc.text(`Issue Date: ${today}`, 20, yPos);
+                    yPos += 15;
+                    
+                    if (savedSignature) {
+                        doc.addImage(savedSignature, 'PNG', 20, yPos, 50, 20);
+                        yPos += 22;
+                    }
+                    doc.text('_________________________', 20, yPos);
+                    yPos += 6;
+                    doc.text('Authorized Signature', 20, yPos);
+                    
+                    doc.save(`50Tawi_${employee.name.replace(/\s+/g, '_')}.pdf`);
+                    
+                    // Update progress
+                    const progress = Math.round(((i + 1) / csvData.length) * 100);
+                    progressFill.style.width = progress + '%';
+                    progressFill.textContent = progress + '%';
+                    
+                    // Small delay between files
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                progressBar.style.display = 'none';
+                showAlert('success', `✅ สร้าง PDF ทั้งหมดสำเร็จ! (${csvData.length} ไฟล์) / All PDFs generated successfully! (${csvData.length} files)`);
+                
+            } catch (error) {
+                progressBar.style.display = 'none';
+                showAlert('error', '❌ เกิดข้อผิดพลาด / Error: ' + error.message);
+                console.error(error);
+            }
+        }
+        
+        // Auto-load company info on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('companyInfo');
+            if (saved) {
+                loadCompanyInfo();
+            }
+        });
     </script>
 </body>
 </html>
