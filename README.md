@@ -1,218 +1,197 @@
-# 🇹🇭 Thailand 50 Tawi Tax Document Generator Pro
+# 🇹🇭 เครื่องมือสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live-success)](https://kumakuku.github.io/50tawi-tax-document-generator/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+**Thailand 50 Tawi Tax Withholding Certificate Generator Pro**
 
-Professional web-based tool for batch generating Thailand Withholding Tax Certificates (Section 50 Bis / 50 ทวิ) in PDF format from CSV files.
-
-เครื่องมือสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ) แบบอัตโนมัติในรูปแบบ PDF จากไฟล์ CSV
+เครื่องมือสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (แบบ 50 ทวิ) แบบอัตโนมัติในรูปแบบ PDF จากไฟล์ CSV  
+A professional web-based tool for batch generating Thailand tax withholding certificates (50 Tawi forms) in PDF format from CSV data files.
 
 ---
 
-## ✨ Features / ฟีเจอร์หลัก
+## ✨ คุณสมบัติเด่น / Features
 
-### 🆕 Pro Version Features
-- **📄 Real PDF Generation** - Generate actual PDF files using jsPDF library
-- **🏢 Company Information Management** - Save and reuse company details with LocalStorage
-- **💰 Multiple Income Types** - Support 8 different income categories
-- **✍️ Digital Signature** - Add digital signatures using SignaturePad
-- **🎨 Professional UI** - Modern gradient design with responsive layout
-- **📊 Batch Processing** - Generate multiple PDFs with progress tracking
-- **💾 Auto-save** - Automatic company info persistence
-- **🔄 Data Preview** - Review data before generating documents
+### 📋 ฟังก์ชันหลัก / Core Functions
+- **✅ สร้าง PDF จริง** - Generate genuine PDF documents with jsPDF library
+- **🏢 ปรับแต่งข้อมูลบริษัท** - Customize company information with auto-save
+- **📊 อัปโหลด CSV** - Drag-and-drop CSV file upload with data preview
+- **⚡ ประมวลผลเป็นชุด** - Batch process multiple employees at once
+- **✍️ ลายเซ็นดิจิทัล** - Digital signature pad with save/reuse functionality
+- **💰 เลือกประเภทเงินได้** - Support for 7 income types (salary, bonus, overtime, commission, etc.)
+- **📱 Responsive Design** - Works on desktop, tablet, and mobile devices
+- **🔒 ปลอดภัย 100%** - All processing happens locally in browser (no server uploads)
 
-### 📋 Supported Income Types
-1. เงินเดือน ค่าจ้าง / Salary & Wages
-2. ค่าธรรมเนียม ค่านายหน้า / Fee, Commission
-3. ค่าแห่งลิขสิทธิ์ / Royalty
-4. ดอกเบี้ย เงินปันผล / Interest, Dividend
-5. ค่าเช่าทรัพย์สิน / Rental Income
-6. รางวัล ส่วนลด / Prize, Discount
-7. รับเหมาก่อสร้าง / Construction Contract
-8. รายได้อื่นๆ / Other Income
-
----
-
-## 🚀 Quick Start / เริ่มต้นใช้งาน
-
-### Option 1: Use Online (Recommended)
-Visit the live demo: **[https://kumakuku.github.io/50tawi-tax-document-generator/](https://kumakuku.github.io/50tawi-tax-document-generator/)**
-
-### Option 2: Download and Run Locally
-1. Download `index.html` from this repository
-2. Open the file in your web browser (Chrome, Firefox, Edge, Safari)
-3. No installation or server required!
+### 🎯 ประเภทเงินได้ที่รองรับ / Supported Income Types
+1. เงินเดือน (Salary)
+2. ค่าจ้าง (Wage)
+3. โบนัส (Bonus)
+4. ค่าล่วงเวลา (Overtime)
+5. ค่าคอมมิชชั่น (Commission)
+6. เบี้ยเลี้ยง (Allowance)
+7. อื่นๆ (Other)
 
 ---
 
-## 📖 How to Use / วิธีใช้งาน
+## 🚀 วิธีใช้งาน / How to Use
 
-### Step 1: Enter Company Information / กรอกข้อมูลบริษัท
-- Company Name (ชื่อบริษัท)
-- Tax ID (เลขประจำตัวผู้เสียภาษี) - 13 digits
-- Address (ที่อยู่)
-- Phone (optional)
-- Email (optional)
-- Click **Save Company Info** to store for future use
+### ขั้นตอนที่ 1: ดาวน์โหลดไฟล์
+1. ดาวน์โหลด `index.html` จาก repository นี้
+2. เปิดไฟล์ด้วยเว็บเบราว์เซอร์ (Chrome, Firefox, Safari, Edge)
 
-### Step 2: Select Income Type / เลือกประเภทเงินได้
-Choose the appropriate income category from the dropdown menu
+### ขั้นตอนที่ 2: กรอกข้อมูลบริษัท
+- ชื่อบริษัท / ผู้ประกอบการ
+- เลขประจำตัวผู้เสียภาษี (13 หลัก)
+- ที่อยู่
+- เบอร์โทรศัพท์ (ถ้ามี)
+- อีเมล (ถ้ามี)
 
-### Step 3: Add Digital Signature / เพิ่มลายเซ็นดิจิทัล
-- Draw your signature on the canvas
-- Click **Save** to store the signature
-- Use **Clear** to redraw
+คลิก "💾 บันทึกข้อมูลบริษัท" เพื่อบันทึกไว้ใช้ครั้งต่อไป
 
-### Step 4: Upload CSV File / อัปโหลดไฟล์ CSV
-- Drag and drop your CSV file, or click to browse
-- The file will be validated and previewed automatically
+### ขั้นตอนที่ 3: สร้างลายเซ็นดิจิทัล
+1. เขียนลายเซ็นในกรอบที่กำหนด
+2. คลิก "💾 บันทึกลายเซ็น"
+3. ลายเซ็นจะถูกบันทึกไว้ใช้กับทุกเอกสาร
 
-### Step 5: Generate PDFs / สร้างไฟล์ PDF
-- **Test First PDF**: Generate a sample PDF for the first employee
-- **Generate All PDFs**: Batch generate PDFs for all employees
-- PDFs will be downloaded automatically to your Downloads folder
+### ขั้นตอนที่ 4: เลือกประเภทเงินได้
+เลือกประเภทเงินได้ที่จ่ายจากเมนูดรอปดาวน์ (เช่น เงินเดือน, โบนัส, ค่าล่วงเวลา)
+
+### ขั้นตอนที่ 5: อัปโหลดไฟล์ CSV
+1. เตรียมไฟล์ CSV ตามรูปแบบที่กำหนด (ดูด้านล่าง)
+2. ลากไฟล์มาวางในพื้นที่อัปโหลด หรือคลิกเพื่อเลือกไฟล์
+3. ตรวจสอบข้อมูลที่แสดงในตารางตัวอย่าง
+
+### ขั้นตอนที่ 6: สร้าง PDF
+คลิก "📄 สร้าง PDF ทั้งหมด" เพื่อสร้างเอกสาร PDF สำหรับพนักงานทุกคน
 
 ---
 
-## 📊 CSV File Format / รูปแบบไฟล์ CSV
+## 📄 รูปแบบไฟล์ CSV / CSV Format
 
-### Required Columns (ข้อมูลที่ต้องมี):
+### โครงสร้างไฟล์ / File Structure
 
 ```csv
-employee_name,tax_id,personal_id,address,payment_date,income_type,amount_paid,tax_withheld,social_security,provident_fund
-Somchai Jaidee,1234567890123,1-2345-67890-12-3,"123 Main St, Bangkok",2024-01-15,Salary,50000,5000,750,2500
-Pranee Suksa,9876543210987,3-4567-89012-34-5,"456 Second Rd, Chiang Mai",2024-01-15,Salary,45000,4500,750,2250
+ชื่อ-นามสกุล,เลขประจำตัวประชาชน,ที่อยู่,เงินได้,ภาษีหัก,เดือน,ปี
+สมชาย ใจดี,1234567890123,"123 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110",50000,2500,มกราคม,2567
 ```
 
-### Column Descriptions:
-- `employee_name` - Full name in Thai or English
-- `tax_id` - 13-digit tax identification number
-- `personal_id` - Thai national ID (13 digits with dashes)
-- `address` - Full address
-- `payment_date` - Payment date (YYYY-MM-DD format)
-- `income_type` - Type of income (e.g., "Salary", "Fee", "Commission")
-- `amount_paid` - Total income amount (number)
-- `tax_withheld` - Tax amount withheld (number)
-- `social_security` - Social security contribution (number)
-- `provident_fund` - Provident fund contribution (number)
+### คำอธิบายคอลัมน์ / Column Descriptions
 
-### 📥 Sample File
-Download the sample CSV file: [sample_data.csv](./sample_data.csv)
+| คอลัมน์ | ความหมาย | ตัวอย่าง |
+|---------|----------|----------|
+| **ชื่อ-นามสกุล** | ชื่อและนามสกุลพนักงาน | สมชาย ใจดี |
+| **เลขประจำตัวประชาชน** | เลขบัตรประชาชน 13 หลัก | 1234567890123 |
+| **ที่อยู่** | ที่อยู่เต็มรูปแบบ | 123 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110 |
+| **เงินได้** | จำนวนเงินที่จ่าย (บาท) | 50000 |
+| **ภาษีหัก** | ภาษีที่หักไว้ (บาท) | 2500 |
+| **เดือน** | เดือนที่จ่าย | มกราคม, กุมภาพันธ์, มีนาคม, etc. |
+| **ปี** | ปี พ.ศ. | 2567 |
 
----
+### ไฟล์ตัวอย่าง / Sample File
 
-## 🛠️ Technical Details / รายละเอียดทางเทคนิค
-
-### Technologies Used
-- **HTML5** - Document structure
-- **CSS3** - Modern styling with gradients and animations
-- **JavaScript (ES6+)** - Core functionality
-- **jsPDF** - PDF generation library
-- **html2canvas** - HTML to canvas conversion
-- **SignaturePad** - Digital signature capture
-
-### Browser Compatibility
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-
-### Features
-- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
-- 💾 **LocalStorage** - Save company info and signatures
-- 🎨 **Modern UI** - Gradient backgrounds, smooth animations
-- 🔒 **Privacy First** - All processing done in browser, no data sent to server
-- 🚀 **Fast** - Pure client-side, no server delays
+ดาวน์โหลดไฟล์ตัวอย่าง: [`sample_data.csv`](sample_data.csv)
 
 ---
 
-## 📁 Repository Structure / โครงสร้างไฟล์
+## 💾 การบันทึกข้อมูล / Data Storage
 
-```
-50tawi-tax-document-generator/
-├── index.html              # Pro version (main file)
-├── index_basic.html        # Basic version (original)
-├── sample_data.csv         # Sample CSV with 5 employees
-└── README.md              # This file
-```
+### Local Storage
+- **ข้อมูลบริษัท**: บันทึกใน browser's localStorage
+- **ลายเซ็นดิจิทัล**: บันทึกเป็นภาพ base64 ใน localStorage
+- **ความปลอดภัย**: ข้อมูลทั้งหมดเก็บไว้ในเครื่องของคุณเท่านั้น ไม่มีการส่งข้อมูลไปยังเซิร์ฟเวอร์
 
----
-
-## 🔐 Privacy & Security / ความเป็นส่วนตัวและความปลอดภัย
-
-- ✅ **100% Client-Side** - All data processing happens in your browser
-- ✅ **No Server Upload** - CSV files never leave your computer
-- ✅ **No Tracking** - No analytics or third-party scripts
-- ✅ **LocalStorage Only** - Company info saved locally on your device
-- ✅ **Secure** - Can be used offline after first load
+### การล้างข้อมูล / Clear Data
+หากต้องการลบข้อมูลที่บันทึกไว้:
+1. เปิด Browser Developer Tools (F12)
+2. ไปที่แท็บ Application/Storage
+3. เลือก Local Storage
+4. ลบ keys: `companyInfo` และ `signature`
 
 ---
 
-## 💡 Tips & Best Practices / เคล็ดลับการใช้งาน
+## 🛠️ เทคโนโลยีที่ใช้ / Technologies Used
 
-1. **Save Company Info**: Use the "Save Company Info" button to avoid re-entering data
-2. **Test First**: Use "Test First PDF" to verify your data before generating all PDFs
-3. **UTF-8 Encoding**: Ensure your CSV file is saved with UTF-8 encoding for Thai characters
-4. **Signature Once**: Save your signature once and reuse it for all documents
-5. **Backup CSV**: Keep a backup of your CSV file for record-keeping
-
----
-
-## 🆚 Version Comparison / เปรียบเทียบเวอร์ชัน
-
-| Feature | Basic Version | Pro Version |
-|---------|--------------|-------------|
-| HTML Preview | ✅ | ✅ |
-| CSV Upload | ✅ | ✅ |
-| Batch Processing | ✅ | ✅ |
-| **PDF Generation** | ❌ | ✅ |
-| **Company Info Save** | ❌ | ✅ |
-| **Income Type Selection** | ❌ | ✅ |
-| **Digital Signature** | ❌ | ✅ |
-| **Progress Bar** | ❌ | ✅ |
-| **Modern UI** | ❌ | ✅ |
+- **HTML5** - โครงสร้างหน้าเว็บ
+- **CSS3** - การออกแบบและ responsive design
+- **JavaScript (Vanilla)** - ตรรกะและการประมวลผล
+- **jsPDF** - สร้างไฟล์ PDF
+- **html2canvas** - แปลง HTML เป็นภาพ (สำรอง)
+- **Signature Pad** - แพดสำหรับเขียนลายเซ็น
 
 ---
 
-## 🤝 Contributing / การมีส่วนร่วม
+## 📋 ข้อกำหนดระบบ / System Requirements
 
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
-- Improve documentation
+### เว็บเบราว์เซอร์ / Browsers
+- ✅ Google Chrome (แนะนำ / Recommended)
+- ✅ Mozilla Firefox
+- ✅ Microsoft Edge
+- ✅ Safari
+- ⚠️ Internet Explorer (ไม่รองรับ / Not supported)
 
----
-
-## 📄 License / ใบอนุญาต
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 🙏 Acknowledgments / กิตติกรรมประกาศ
-
-- **jsPDF** - PDF generation
-- **html2canvas** - HTML to canvas conversion
-- **SignaturePad** - Digital signature capture
-- Thailand Revenue Department - Tax form specifications
+### อุปกรณ์ / Devices
+- 💻 Desktop / Laptop
+- 📱 Tablet
+- 📱 Mobile Phone
 
 ---
 
-## 📞 Support / ติดต่อสอบถาม
+## ⚠️ ข้อควรระวัง / Important Notes
 
-For questions or support, please open an issue in this repository.
-
----
-
-## 🔗 Links / ลิงก์ที่เกี่ยวข้อง
-
-- 🌐 [Live Demo](https://kumakuku.github.io/50tawi-tax-document-generator/)
-- 📚 [GitHub Repository](https://github.com/kumakuku/50tawi-tax-document-generator)
-- 📖 [Thailand Revenue Department](https://www.rd.go.th/)
+1. **ความถูกต้องของข้อมูล**: กรุณาตรวจสอบความถูกต้องของข้อมูลในไฟล์ CSV ก่อนสร้าง PDF
+2. **เลขประจำตัวประชาชน**: ต้องเป็นตัวเลข 13 หลัก
+3. **เลขประจำตัวผู้เสียภาษี**: ต้องเป็นตัวเลข 13 หลัก
+4. **การแสดงผลภาษาไทย**: หากแสดงผลภาษาไทยไม่ถูกต้อง ให้ตรวจสอบว่าไฟล์ CSV บันทึกด้วย UTF-8 encoding
+5. **ขนาดไฟล์**: หากมีพนักงานจำนวนมาก (มากกว่า 100 คน) อาจใช้เวลาในการสร้าง PDF นานขึ้น
 
 ---
 
-**Made with ❤️ for Thailand's tax professionals**
+## 🐛 การแก้ไขปัญหา / Troubleshooting
 
-*Last updated: January 2026*
+### ปัญหา: ภาษาไทยแสดงผลเป็นอักขระแปลกๆ
+**แก้ไข**: 
+- บันทึกไฟล์ CSV ด้วย UTF-8 encoding
+- ใน Excel: File → Save As → เลือก "CSV UTF-8"
+- ใน Google Sheets: File → Download → CSV
+
+### ปัญหา: PDF ไม่ถูกสร้าง
+**แก้ไข**:
+- ตรวจสอบว่ากรอกข้อมูลบริษัทครบถ้วน
+- ตรวจสอบว่าบันทึกลายเซ็นแล้ว
+- ตรวจสอบว่าอัปโหลดไฟล์ CSV แล้ว
+- ลองใช้เบราว์เซอร์อื่น
+
+### ปัญหา: ข้อมูลบริษัทหายหลังปิดเบราว์เซอร์
+**แก้ไข**:
+- ตรวจสอบว่าคลิก "บันทึกข้อมูลบริษัท" แล้ว
+- ตรวจสอบว่า browser ไม่ได้เปิด Private/Incognito mode
+- ตรวจสอบ browser settings ว่าอนุญาต localStorage
+
+---
+
+## 📝 License
+
+MIT License - ใช้งานได้ฟรี เพื่อการศึกษาและการพาณิชย์
+
+---
+
+## 👨‍💻 การพัฒนาเพิ่มเติม / Future Development
+
+- [ ] รองรับภาษาอังกฤษเต็มรูปแบบ
+- [ ] เพิ่ม font ภาษาไทยคุณภาพสูงใน PDF
+- [ ] รองรับการอัปโหลดโลโก้บริษัท
+- [ ] Export เป็นไฟล์ ZIP รวม PDF ทั้งหมด
+- [ ] Template แบบฟอร์ม 50 ทวิ ที่ปรับแต่งได้
+- [ ] รองรับข้อมูลจาก Excel โดยตรง
+- [ ] สรุปรายงานภาษีรวมทั้งหมด
+
+---
+
+## 📞 ติดต่อ / Contact
+
+หากพบปัญหาหรือต้องการข้อเสนอแนะ กรุณาเปิด Issue ใน GitHub repository นี้
+
+---
+
+## 🙏 ขอบคุณ / Credits
+
+พัฒนาด้วย ❤️ สำหรับธุรกิจไทยและผู้ประกอบการทุกท่าน
+
+**Happy Tax Filing! 🎉**
