@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เครื่องมือสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)</title>
+    <title>ระบบสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (ภ.ง.ด. 1ก)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         
         * {
             margin: 0;
@@ -22,11 +23,11 @@
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
         
@@ -40,82 +41,111 @@
         .header h1 {
             font-size: 28px;
             margin-bottom: 10px;
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .header p {
             font-size: 16px;
-            opacity: 0.9;
+            opacity: 0.95;
         }
         
         .content {
-            padding: 30px;
+            padding: 40px;
         }
         
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             padding: 25px;
             background: #f8f9fa;
-            border-radius: 15px;
+            border-radius: 10px;
             border-left: 4px solid #667eea;
         }
         
-        .section h2 {
+        .section-title {
             font-size: 20px;
+            font-weight: 600;
+            color: #667eea;
             margin-bottom: 20px;
-            color: #333;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
+        .section-title::before {
+            content: '';
+            width: 6px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 3px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
         }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
+        label {
             font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
         }
         
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             font-family: 'Sarabun', sans-serif;
             transition: all 0.3s;
         }
         
-        .form-group input:focus,
-        .form-group textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
-        .form-group textarea {
+        textarea {
             resize: vertical;
             min-height: 80px;
+        }
+        
+        .signature-pad {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            background: white;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        
+        .signature-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
         }
         
         .btn {
             padding: 12px 24px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Sarabun', sans-serif;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .btn-primary {
@@ -140,68 +170,70 @@
         .btn-success {
             background: #28a745;
             color: white;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .canvas-container {
-            border: 2px dashed #667eea;
-            border-radius: 8px;
-            background: white;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-        
-        #signatureCanvas {
+            font-size: 18px;
+            padding: 15px 40px;
             width: 100%;
-            height: 150px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            cursor: crosshair;
-            touch-action: none;
+            margin-top: 20px;
         }
         
-        .file-upload {
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        .csv-upload {
             border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 40px;
+            border-radius: 10px;
+            padding: 30px;
             text-align: center;
+            background: #f8f9fa;
             cursor: pointer;
             transition: all 0.3s;
-            background: white;
         }
         
-        .file-upload:hover {
-            background: #f8f9fa;
-            border-color: #764ba2;
+        .csv-upload:hover {
+            background: #e9ecef;
+            border-color: #5568d3;
         }
         
-        .file-upload.dragover {
-            background: #e7f3ff;
-            border-color: #0066cc;
-        }
-        
-        #csvFile {
+        .csv-upload input[type="file"] {
             display: none;
         }
         
-        .file-info {
+        .preview-table {
             margin-top: 20px;
-            padding: 15px;
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
             border-radius: 8px;
-            color: #155724;
-            display: none;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
         }
         
         .progress-container {
-            margin-top: 20px;
             display: none;
+            margin-top: 20px;
         }
         
         .progress-bar {
@@ -210,498 +242,533 @@
             background: #e0e0e0;
             border-radius: 15px;
             overflow: hidden;
-            position: relative;
         }
         
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
             transition: width 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 14px;
         }
         
-        .generate-btn {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            margin-top: 20px;
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .no-print {
+                display: none;
+            }
         }
         
         .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #0066cc;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 5px;
             margin-bottom: 20px;
         }
         
-        .info-box strong {
-            color: #0066cc;
-            display: block;
-            margin-bottom: 8px;
-        }
-        
-        .info-box code {
-            background: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #d63384;
+        .info-box p {
+            margin: 5px 0;
+            color: #1565c0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🇹🇭 เครื่องมือสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)</h1>
-            <p>Thailand 50 Tawi Tax Withholding Certificate Generator - Professional Edition</p>
+            <h1>🧾 ระบบสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย</h1>
+            <p>ตามมาตรา 50 ทวิ แห่งประมวลรัษฎากร (ภ.ง.ด. 1ก)</p>
         </div>
         
         <div class="content">
-            <!-- Company Information Section -->
+            <!-- ข้อมูลบริษัท -->
             <div class="section">
-                <h2>📋 ข้อมูลผู้มีหน้าที่หักภาษี ณ ที่จ่าย</h2>
-                
-                <div class="form-group">
-                    <label>ชื่อบริษัท/ผู้จ่ายเงิน *</label>
-                    <input type="text" id="companyName" placeholder="บริษัท ABC จำกัด">
-                </div>
-                
-                <div class="form-group">
-                    <label>เลขประจำตัวผู้เสียภาษีอากร (13 หลัก) *</label>
-                    <input type="text" id="companyTaxId" placeholder="0123456789012" maxlength="13">
-                </div>
-                
-                <div class="form-group">
-                    <label>ที่อยู่ *</label>
-                    <textarea id="companyAddress" placeholder="123 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>เลขที่บัญชีนายจ้าง (ถ้ามี)</label>
-                    <input type="text" id="employerAccount" placeholder="1-2345-67890-12">
-                </div>
-                
-                <div class="form-group">
-                    <label>เลขที่ใบอนุญาตกองทุนสำรองเลี้ยงชีพ (ถ้ามี)</label>
-                    <input type="text" id="providentFund" placeholder="PVD-12345">
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="saveCompanyData()">💾 บันทึกข้อมูล</button>
-                    <button class="btn btn-secondary" onclick="loadCompanyData()">📂 โหลดข้อมูล</button>
-                </div>
-            </div>
-            
-            <!-- Signature Section -->
-            <div class="section">
-                <h2>✍️ ลายเซ็นผู้มีหน้าที่หักภาษี</h2>
-                <p style="color: #666; margin-bottom: 15px; font-size: 14px;">วาดลายเซ็นของคุณ</p>
-                
-                <div class="canvas-container">
-                    <canvas id="signatureCanvas"></canvas>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="clearSignature()">🗑️ ลบลายเซ็น</button>
-                    <button class="btn btn-primary" onclick="saveSignature()">💾 บันทึกลายเซ็น</button>
-                    <button class="btn btn-secondary" onclick="loadSignature()">📂 โหลดลายเซ็น</button>
-                </div>
-            </div>
-            
-            <!-- CSV Upload Section -->
-            <div class="section">
-                <h2>📤 อัปโหลดไฟล์ CSV</h2>
-                
+                <div class="section-title">📋 ข้อมูลผู้มีหน้าที่หักภาษี ณ ที่จ่าย (บริษัท)</div>
                 <div class="info-box">
-                    <strong>📋 รูปแบบ CSV ที่ต้องการ:</strong>
-                    <code>ชื่อ-นามสกุล, เลขประจำตัวประชาชน, ที่อยู่, ประเภทเงินได้, จำนวนเงินที่จ่าย, ภาษีที่หัก, วันที่จ่าย, ลำดับที่, แบบยื่น, ปีภาษี</code>
+                    <p><strong>💡 คำแนะนำ:</strong> กรอกข้อมูลบริษัทของคุณ ระบบจะบันทึกไว้ใช้งานครั้งถัดไป</p>
                 </div>
-                
-                <div class="file-upload" id="fileUpload" onclick="document.getElementById('csvFile').click()">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
-                    <strong style="display: block; font-size: 16px; margin-bottom: 5px;">คลิกเพื่อเลือกไฟล์ CSV</strong>
-                    <span style="color: #666; font-size: 14px;">หรือลากไฟล์มาวางที่นี่</span>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ชื่อบริษัท *</label>
+                        <input type="text" id="company_name" placeholder="บริษัท ABC จำกัด">
+                    </div>
+                    <div class="form-group">
+                        <label>เลขประจำตัวผู้เสียภาษี (13 หลัก) *</label>
+                        <input type="text" id="company_tax_id" placeholder="0123456789012" maxlength="13">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>ที่อยู่บริษัท *</label>
+                        <textarea id="company_address" placeholder="เลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+                    </div>
                 </div>
-                <input type="file" id="csvFile" accept=".csv" onchange="handleFileSelect(event)">
-                
-                <div class="file-info" id="fileInfo">
-                    ✅ <span id="fileName"></span> (<span id="recordCount"></span> รายการ)
-                </div>
-                
-                <div class="progress-container" id="progressBar">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            
+            <!-- ข้อมูลผู้ลงนาม -->
+            <div class="section">
+                <div class="section-title">✍️ ข้อมูลผู้ลงนาม</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ชื่อผู้ลงนาม *</label>
+                        <input type="text" id="signer_name" placeholder="นายสมชาย ใจดี">
+                    </div>
+                    <div class="form-group">
+                        <label>ตำแหน่ง *</label>
+                        <input type="text" id="signer_position" placeholder="ผู้จัดการ">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ออกหนังสือรับรอง *</label>
+                        <input type="date" id="issue_date">
                     </div>
                 </div>
                 
-                <button class="btn btn-success generate-btn" id="generateBtn" onclick="generatePDFs()" disabled>
-                    ⚡ สร้าง PDF ทั้งหมด
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>ลายเซ็นดิจิทัล (วาดลายเซ็นด้านล่าง)</label>
+                    <canvas id="signature_pad" class="signature-pad" width="600" height="200"></canvas>
+                    <div class="signature-controls">
+                        <button class="btn btn-secondary" onclick="clearSignature()">🗑️ ล้างลายเซ็น</button>
+                        <button class="btn btn-secondary" onclick="saveSignature()">💾 บันทึกลายเซ็น</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ประเภทแบบฟอร์ม -->
+            <div class="section">
+                <div class="section-title">📝 ประเภทแบบฟอร์ม</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_1" value="1ก" checked>
+                        <label for="form_type_1">ภ.ง.ด. 1ก</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_2" value="1ก.พิเศษ">
+                        <label for="form_type_2">ภ.ง.ด. 1ก.พิเศษ</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_3" value="2">
+                        <label for="form_type_3">ภ.ง.ด. 2</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_4" value="2ก">
+                        <label for="form_type_4">ภ.ง.ด. 2ก</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_5" value="3">
+                        <label for="form_type_5">ภ.ง.ด. 3</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_6" value="3ก">
+                        <label for="form_type_6">ภ.ง.ด. 3ก</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="form_type_7" value="53">
+                        <label for="form_type_7">ภ.ง.ด. 53</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- อัปโหลด CSV -->
+            <div class="section">
+                <div class="section-title">📤 อัปโหลดข้อมูลพนักงาน</div>
+                <div class="info-box">
+                    <p><strong>📊 รูปแบบ CSV:</strong> ลำดับที่, ชื่อ-นามสกุล, เลขประจำตัวประชาชน, ที่อยู่, ประเภทเงินได้, จำนวนเงินที่จ่าย, ภาษีที่หัก, วันเดือนปีที่จ่าย</p>
+                    <p><strong>ตัวอย่าง:</strong> 1, นายสมชาย กิตติกุล, 1234567890123, 123 ถ.สุขุมวิท..., เงินเดือน, 50000, 5000, 2568</p>
+                </div>
+                
+                <label for="csv_file" class="csv-upload">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
+                    <div style="font-size: 18px; font-weight: 600; color: #667eea;">คลิกเพื่ออัปโหลดไฟล์ CSV</div>
+                    <div style="font-size: 14px; color: #666; margin-top: 5px;">หรือลากไฟล์มาวางที่นี่</div>
+                    <input type="file" id="csv_file" accept=".csv" onchange="handleCSV(event)">
+                </label>
+                
+                <div class="preview-table" id="preview_table"></div>
+            </div>
+            
+            <!-- ปุ่มสร้าง PDF -->
+            <div class="section no-print">
+                <button class="btn btn-success" onclick="generateAllPDFs()">
+                    🚀 สร้างหนังสือรับรองทั้งหมด (PDF)
                 </button>
+                
+                <div class="progress-container" id="progress_container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress_fill">0%</div>
+                    </div>
+                    <p style="text-align: center; margin-top: 10px; font-weight: 600;" id="progress_text"></p>
+                </div>
             </div>
         </div>
     </div>
-
+    
     <script>
-        // Canvas setup for signature
-        const canvas = document.getElementById('signatureCanvas');
-        const ctx = canvas.getContext('2d');
+        // === Configuration ===
+        const STORAGE_KEY = 'company_data_50tawi';
+        let csvData = [];
+        let signaturePad = null;
         let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
+        let savedSignature = null;
         
-        // Set canvas size
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+        // === Initialize ===
+        window.onload = function() {
+            loadCompanyData();
+            initSignaturePad();
+            setDefaultDate();
+        };
+        
+        // === Signature Pad ===
+        function initSignaturePad() {
+            const canvas = document.getElementById('signature_pad');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
         
-        // Drawing functions
         function startDrawing(e) {
             isDrawing = true;
+            const canvas = document.getElementById('signature_pad');
+            const ctx = canvas.getContext('2d');
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            [lastX, lastY] = [x, y];
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
         
         function draw(e) {
             if (!isDrawing) return;
-            e.preventDefault();
-            
+            const canvas = document.getElementById('signature_pad');
+            const ctx = canvas.getContext('2d');
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
             ctx.stroke();
-            
-            [lastX, lastY] = [x, y];
         }
         
         function stopDrawing() {
             isDrawing = false;
         }
         
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-        
-        canvas.addEventListener('touchstart', startDrawing);
-        canvas.addEventListener('touchmove', draw);
-        canvas.addEventListener('touchend', stopDrawing);
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            e.target.dispatchEvent(mouseEvent);
+        }
         
         function clearSignature() {
+            const canvas = document.getElementById('signature_pad');
+            const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            savedSignature = null;
         }
         
         function saveSignature() {
-            const signatureData = canvas.toDataURL();
-            localStorage.setItem('signature', signatureData);
+            const canvas = document.getElementById('signature_pad');
+            savedSignature = canvas.toDataURL();
             alert('✅ บันทึกลายเซ็นเรียบร้อย');
         }
         
-        function loadSignature() {
-            const signatureData = localStorage.getItem('signature');
-            if (signatureData) {
-                const img = new Image();
-                img.onload = function() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                };
-                img.src = signatureData;
-                alert('✅ โหลดลายเซ็นเรียบร้อย');
-            } else {
-                alert('❌ ไม่พบลายเซ็นที่บันทึกไว้');
+        // === Company Data ===
+        function loadCompanyData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('company_name').value = data.company_name || '';
+                document.getElementById('company_tax_id').value = data.company_tax_id || '';
+                document.getElementById('company_address').value = data.company_address || '';
+                document.getElementById('signer_name').value = data.signer_name || '';
+                document.getElementById('signer_position').value = data.signer_position || '';
             }
         }
         
-        // Company data functions
         function saveCompanyData() {
             const data = {
-                companyName: document.getElementById('companyName').value,
-                companyTaxId: document.getElementById('companyTaxId').value,
-                companyAddress: document.getElementById('companyAddress').value,
-                employerAccount: document.getElementById('employerAccount').value,
-                providentFund: document.getElementById('providentFund').value
+                company_name: document.getElementById('company_name').value,
+                company_tax_id: document.getElementById('company_tax_id').value,
+                company_address: document.getElementById('company_address').value,
+                signer_name: document.getElementById('signer_name').value,
+                signer_position: document.getElementById('signer_position').value
             };
-            localStorage.setItem('companyData', JSON.stringify(data));
-            alert('✅ บันทึกข้อมูลบริษัทเรียบร้อย');
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
         
-        function loadCompanyData() {
-            const data = JSON.parse(localStorage.getItem('companyData'));
-            if (data) {
-                document.getElementById('companyName').value = data.companyName || '';
-                document.getElementById('companyTaxId').value = data.companyTaxId || '';
-                document.getElementById('companyAddress').value = data.companyAddress || '';
-                document.getElementById('employerAccount').value = data.employerAccount || '';
-                document.getElementById('providentFund').value = data.providentFund || '';
-                alert('✅ โหลดข้อมูลบริษัทเรียบร้อย');
-            } else {
-                alert('❌ ไม่พบข้อมูลบริษัทที่บันทึกไว้');
-            }
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('issue_date').value = today;
         }
         
-        // Drag and drop for file upload
-        const fileUpload = document.getElementById('fileUpload');
-        
-        fileUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fileUpload.classList.add('dragover');
-        });
-        
-        fileUpload.addEventListener('dragleave', () => {
-            fileUpload.classList.remove('dragover');
-        });
-        
-        fileUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            fileUpload.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('csvFile').files = files;
-                handleFileSelect({ target: { files: files } });
-            }
-        });
-        
-        // CSV handling
-        let csvData = [];
-        
-        function handleFileSelect(event) {
+        // === CSV Handler ===
+        function handleCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 const text = e.target.result;
-                csvData = parseCSV(text);
-                
-                document.getElementById('fileName').textContent = file.name;
-                document.getElementById('recordCount').textContent = csvData.length;
-                document.getElementById('fileInfo').style.display = 'block';
-                document.getElementById('generateBtn').disabled = false;
+                parseCSV(text);
             };
             reader.readAsText(file, 'UTF-8');
         }
         
         function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
+            const lines = text.split('\n').filter(line => line.trim());
+            csvData = [];
             
+            // Skip header row
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',');
-                const row = {};
-                headers.forEach((header, index) => {
-                    row[header] = values[index] ? values[index].trim() : '';
-                });
-                data.push(row);
+                const cols = lines[i].split(',').map(col => col.trim());
+                if (cols.length >= 8) {
+                    csvData.push({
+                        sequence: cols[0],
+                        name: cols[1],
+                        tax_id: cols[2],
+                        address: cols[3],
+                        income_type: cols[4],
+                        amount_paid: parseFloat(cols[5]) || 0,
+                        tax_withheld: parseFloat(cols[6]) || 0,
+                        payment_year: cols[7]
+                    });
+                }
             }
             
-            return data;
+            displayPreview();
         }
         
-        // TH Sarabun New font Base64 (subset for Thai characters - minimal version)
-        const thSarabunFont = 'AAEAAAASAQAABAAgR0RFRgBPAGkAACK8AAAAHEdQT1P/tQBkAAAi2AAAACBHU1VCAAEAAQAAIvgAAAAgT1MvMq8qV1sAAAGYAAAAYGNtYXAAsgEGAAACPAAAAVRjdnQgBaYEGAAAAwwAAAAqZnBnbYoYPGsAAAQMAAACLWdhc3D//wADAAAipAAAAAhnbHlmjHwVWwAABjwAABViaGRteDvuGBoAABugAAAAtGhlYWT/0g5UAAABDAAAADZoaGVhB5AEKwAAAUQAAAAkaG10eMjnF/0AAAMYAAABJGxvY2FdTlWQAAAcVAAAAJRtYXhwAo4BhgAAAWgAAAAgbmFtZcydHiAAABzoAAAD+HBvc3T/hgAyAAAgRAAAAFdwcmVwh/I3nQAABjwAAAA7AAEAAAAKABwAHgABbGF0bgAIAAQAAP//AAEAAAABa2VybgAIAAAAAQAAAAEABAACAAAAAgAQAAQApAAAAOgAAQBCAAAAMgAAAAEAAwABAgMBBAAGAAcACAAJAAoACwAMAA0ADgAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAQQBCAAAAAAABAAAAAgADAAQABQAGAAcACAAJAAoACwAMAA0ADgAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAQQBCAEMAAQAAAXQAAwABBAkAAACCAAAAAQAAAXQAAwABAA4AAAC8AAAAAwABAAEAQgABAAQAAAACAAAAAQAAAAEAAAAAAAABAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAEAAgADAAQABQAGAAcACAAJAAoACwAMAA0ADgAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAQQBCAEMAAAEKAVIBZQGCAdMCAAImAk0CdAKbAsIC6QMQAzcDXgOFA6wD0wP6BCEESARvBJYEvQTkBQsFMgVZBYAFpwXOBfUGHAZDBmoGkQa4Bt8HBgctB1QHeweiB8kH8AgXCD4IZQiMCLMI2gkBCW4JnQnICfIKEgoyClIKcgqSCrIK0gryCxILMgtSC3ILkguyCxILkgvzDCoMZQykDM8M+g0lDVANewymDNEM/A0nDVINfQ2oDdMN/g4pDlQOfwAB'; // Truncated for brevity
+        function displayPreview() {
+            if (csvData.length === 0) return;
+            
+            let html = '<h3>ตัวอย่างข้อมูล (' + csvData.length + ' รายการ)</h3>';
+            html += '<table><thead><tr>';
+            html += '<th>ลำดับ</th><th>ชื่อ-นามสกุล</th><th>เลขบัตรประชาชน</th>';
+            html += '<th>ประเภทเงินได้</th><th>จำนวนเงิน</th><th>ภาษีหัก</th><th>ปีภาษี</th>';
+            html += '</tr></thead><tbody>';
+            
+            csvData.slice(0, 10).forEach(row => {
+                html += '<tr>';
+                html += '<td>' + row.sequence + '</td>';
+                html += '<td>' + row.name + '</td>';
+                html += '<td>' + row.tax_id + '</td>';
+                html += '<td>' + row.income_type + '</td>';
+                html += '<td>' + row.amount_paid.toLocaleString() + '</td>';
+                html += '<td>' + row.tax_withheld.toLocaleString() + '</td>';
+                html += '<td>' + row.payment_year + '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            if (csvData.length > 10) {
+                html += '<p style="margin-top: 10px; color: #666;">แสดง 10 รายการแรก จากทั้งหมด ' + csvData.length + ' รายการ</p>';
+            }
+            
+            document.getElementById('preview_table').innerHTML = html;
+        }
         
-        // PDF Generation with Thai Font Support using simpler approach
-        async function generatePDFs() {
+        // === PDF Generation ===
+        async function generateAllPDFs() {
             if (csvData.length === 0) {
                 alert('❌ กรุณาอัปโหลดไฟล์ CSV ก่อน');
                 return;
             }
             
-            const companyName = document.getElementById('companyName').value;
-            const companyTaxId = document.getElementById('companyTaxId').value;
-            const companyAddress = document.getElementById('companyAddress').value;
+            // Validate
+            const companyName = document.getElementById('company_name').value;
+            const companyTaxId = document.getElementById('company_tax_id').value;
+            const companyAddress = document.getElementById('company_address').value;
+            const signerName = document.getElementById('signer_name').value;
+            const signerPosition = document.getElementById('signer_position').value;
+            const issueDate = document.getElementById('issue_date').value;
             
-            if (!companyName || !companyTaxId || !companyAddress) {
-                alert('❌ กรุณากรอกข้อมูลบริษัทให้ครบถ้วน');
+            if (!companyName || !companyTaxId || !companyAddress || !signerName || !signerPosition || !issueDate) {
+                alert('❌ กรุณากรอกข้อมูลให้ครบถ้วน');
                 return;
             }
             
-            const signatureData = canvas.toDataURL();
-            if (!signatureData || signatureData === canvas.toDataURL('image/png', 0)) {
-                if (!confirm('⚠️ คุณยังไม่ได้วาดลายเซ็น ต้องการดำเนินการต่อหรือไม่?')) {
-                    return;
+            // Save company data
+            saveCompanyData();
+            
+            // Get selected form types
+            const formTypes = [];
+            for (let i = 1; i <= 7; i++) {
+                const checkbox = document.getElementById('form_type_' + i);
+                if (checkbox.checked) {
+                    formTypes.push(checkbox.value);
                 }
             }
             
-            document.getElementById('progressBar').style.display = 'block';
+            if (formTypes.length === 0) {
+                alert('❌ กรุณาเลือกประเภทแบบฟอร์มอย่างน้อย 1 ประเภท');
+                return;
+            }
+            
+            // Show progress
+            document.getElementById('progress_container').style.display = 'block';
             
             const { jsPDF } = window.jspdf;
             
             for (let i = 0; i < csvData.length; i++) {
-                const record = csvData[i];
-                const progress = ((i + 1) / csvData.length) * 100;
-                document.getElementById('progressFill').style.width = progress + '%';
-                document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+                const employee = csvData[i];
+                const progress = Math.round(((i + 1) / csvData.length) * 100);
                 
-                await new Promise(resolve => setTimeout(resolve, 100));
+                document.getElementById('progress_fill').style.width = progress + '%';
+                document.getElementById('progress_fill').textContent = progress + '%';
+                document.getElementById('progress_text').textContent = 'กำลังสร้าง: ' + employee.name + ' (' + (i + 1) + '/' + csvData.length + ')';
                 
-                // Create PDF - Use image-based approach for Thai text
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                // Create a hidden div to render Thai text as HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.style.cssText = 'position:absolute;left:-9999px;width:170mm;font-family:Sarabun,sans-serif;background:white;padding:10mm;';
-                tempDiv.innerHTML = `
-                    <div style="font-size:9pt;text-align:left;margin-bottom:3mm;">ฉบับที่ 1 (สำหรับผู้ถูกหักภาษี ณ ที่จ่าย ใช้แนบพร้อมกับแบบแสดงรายการภาษี)</div>
-                    <div style="font-size:14pt;font-weight:bold;text-align:center;margin:5mm 0;">หนังสือรับรองการหักภาษี ณ ที่จ่าย</div>
-                    <div style="font-size:10pt;text-align:center;margin-bottom:5mm;">ตามมาตรา 50 ทวิ แห่งประมวลรัษฎากร</div>
-                    
-                    <div style="font-size:10pt;margin-top:5mm;">
-                        <div style="font-weight:bold;margin-bottom:2mm;">ผู้มีหน้าที่หักภาษี ณ ที่จ่าย :-</div>
-                        <div>ชื่อ ${companyName}</div>
-                        <div>เลขประจำตัวผู้เสียภาษีอากร ${companyTaxId}</div>
-                        <div>ที่อยู่ ${companyAddress}</div>
-                    </div>
-                    
-                    <div style="font-size:10pt;margin-top:8mm;">
-                        <div style="font-weight:bold;margin-bottom:2mm;">ผู้ถูกหักภาษี ณ ที่จ่าย :-</div>
-                        <div>ชื่อ ${record['ชื่อ-นามสกุล'] || ''}</div>
-                        <div>เลขประจำตัวประชาชน ${record['เลขประจำตัวประชาชน'] || ''}</div>
-                        <div>ที่อยู่ ${record['ที่อยู่'] || ''}</div>
-                    </div>
-                    
-                    <div style="font-size:10pt;margin-top:8mm;">
-                        <div>ลำดับที่ ${record['ลำดับที่'] || ''} ในแบบ ${record['แบบยื่น'] || 'ภ.ง.ด.1ก.'}</div>
-                    </div>
-                    
-                    <table style="width:100%;border-collapse:collapse;margin-top:8mm;font-size:9pt;">
-                        <tr style="border-bottom:1px solid #000;">
-                            <th style="text-align:left;padding:3mm;">ประเภทเงินได้พึงประเมินที่จ่าย</th>
-                            <th style="text-align:right;padding:3mm;width:35mm;">จำนวนเงิน</th>
-                            <th style="text-align:right;padding:3mm;width:35mm;">ภาษีที่หัก</th>
-                        </tr>
-                        <tr>
-                            <td style="padding:3mm;">${record['ประเภทเงินได้'] || '1. เงินเดือน ค่าจ้าง'}</td>
-                            <td style="text-align:right;padding:3mm;">${parseFloat(record['จำนวนเงินที่จ่าย'] || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
-                            <td style="text-align:right;padding:3mm;">${parseFloat(record['ภาษีที่หัก'] || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
-                        </tr>
-                        <tr style="border-top:1px solid #000;font-weight:bold;">
-                            <td style="padding:3mm;">รวม</td>
-                            <td style="text-align:right;padding:3mm;">${parseFloat(record['จำนวนเงินที่จ่าย'] || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
-                            <td style="text-align:right;padding:3mm;">${parseFloat(record['ภาษีที่หัก'] || 0).toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
-                        </tr>
-                    </table>
-                    
-                    <div style="font-size:10pt;margin-top:10mm;">
-                        <div>วันที่จ่ายเงิน: ${record['วันที่จ่าย'] || ''}</div>
-                        <div style="margin-top:10mm;">ผู้มีหน้าที่หักภาษี ณ ที่จ่าย</div>
-                    </div>
-                `;
-                document.body.appendChild(tempDiv);
+                const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                // Use html2canvas to convert to image
-                try {
-                    // For simplicity, we'll use text directly in PDF with English fallback
-                    // In production, you should use html2canvas library
-                    pdf.setFontSize(9);
-                    pdf.text('Certificate of Tax Withheld at Source (Form 50 Tawi)', 20, 15);
-                    pdf.setFontSize(12);
-                    pdf.text('According to Section 50 of Revenue Code', 55, 22);
-                    
-                    pdf.setFontSize(10);
-                    let y = 35;
-                    pdf.text('Withholding Agent:', 20, y);
-                    y += 6;
-                    pdf.text(`Name: ${companyName}`, 20, y);
-                    y += 6;
-                    pdf.text(`Tax ID: ${companyTaxId}`, 20, y);
-                    y += 6;
-                    pdf.text(`Address: ${companyAddress}`, 20, y);
-                    
-                    y += 15;
-                    pdf.text('Taxpayer (Payee):', 20, y);
-                    y += 6;
-                    pdf.text(`Name: ${record['ชื่อ-นามสกุล'] || ''}`, 20, y);
-                    y += 6;
-                    pdf.text(`ID: ${record['เลขประจำตัวประชาชน'] || ''}`, 20, y);
-                    y += 6;
-                    pdf.text(`Address: ${record['ที่อยู่'] || ''}`, 20, y);
-                    
-                    y += 12;
-                    pdf.text(`Sequence No: ${record['ลำดับที่'] || ''} in Form ${record['แบบยื่น'] || 'PND.1'}`, 20, y);
-                    
-                    y += 10;
-                    pdf.setFontSize(9);
-                    pdf.text('Income Type', 20, y);
-                    pdf.text('Amount Paid', 120, y);
-                    pdf.text('Tax Withheld', 160, y);
-                    y += 1;
-                    pdf.line(20, y, 190, y);
-                    
-                    y += 5;
-                    const incomeType = '1. Salary, Wages, etc.';
-                    pdf.text(incomeType, 20, y);
-                    pdf.text((parseFloat(record['จำนวนเงินที่จ่าย'] || 0)).toLocaleString('en-US', {minimumFractionDigits: 2}), 120, y);
-                    pdf.text((parseFloat(record['ภาษีที่หัก'] || 0)).toLocaleString('en-US', {minimumFractionDigits: 2}), 160, y);
-                    
-                    y += 10;
-                    pdf.line(20, y, 190, y);
-                    pdf.text('Total', 20, y + 5);
-                    pdf.text((parseFloat(record['จำนวนเงินที่จ่าย'] || 0)).toLocaleString('en-US', {minimumFractionDigits: 2}), 120, y + 5);
-                    pdf.text((parseFloat(record['ภาษีที่หัก'] || 0)).toLocaleString('en-US', {minimumFractionDigits: 2}), 160, y + 5);
-                    
-                    y += 15;
-                    pdf.text(`Payment Date: ${record['วันที่จ่าย'] || ''}`, 20, y);
-                    
-                    // Add signature
-                    if (signatureData && signatureData !== canvas.toDataURL('image/png', 0)) {
-                        pdf.addImage(signatureData, 'PNG', 20, y + 10, 40, 15);
+                // Header
+                pdf.setFontSize(10);
+                pdf.text('Copy 1 (For employee to attach with tax return)', 105, 15, { align: 'center' });
+                
+                pdf.setFontSize(16);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('WITHHOLDING TAX CERTIFICATE', 105, 22, { align: 'center' });
+                
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Section 50 Bis, Revenue Code', 105, 28, { align: 'center' });
+                
+                // Payer info (Left box)
+                pdf.rect(15, 35, 90, 35);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Payer:', 17, 40);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Tax ID: ' + companyTaxId, 17, 45);
+                pdf.text(companyName, 17, 50);
+                
+                const addressLines = pdf.splitTextToSize(companyAddress, 86);
+                pdf.text(addressLines, 17, 55);
+                
+                // Payee info (Right box)
+                pdf.rect(110, 35, 90, 35);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Payee:', 112, 40);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Tax ID: ' + employee.tax_id, 112, 45);
+                pdf.text(employee.name, 112, 50);
+                
+                const empAddressLines = pdf.splitTextToSize(employee.address, 86);
+                pdf.text(empAddressLines, 112, 55);
+                
+                // Form type checkboxes
+                pdf.rect(15, 75, 185, 15);
+                pdf.text('Form Type:', 17, 80);
+                const types = ['1ก', '1ก.พิเศษ', '2', '2ก', '3', '3ก', '53'];
+                let xPos = 45;
+                types.forEach(type => {
+                    if (formTypes.includes(type)) {
+                        pdf.rect(xPos, 76, 4, 4, 'F');
+                    } else {
+                        pdf.rect(xPos, 76, 4, 4);
                     }
-                    
-                    y += 30;
-                    pdf.text('Withholding Agent Signature', 20, y);
-                    
-                } catch (error) {
-                    console.error('Error creating PDF:', error);
+                    pdf.setFontSize(9);
+                    pdf.text(type, xPos + 6, 79.5);
+                    xPos += 20;
+                });
+                
+                // Income table
+                pdf.setFontSize(10);
+                const tableY = 95;
+                
+                pdf.autoTable({
+                    startY: tableY,
+                    head: [['Income Type', 'Year', 'Amount Paid', 'Tax Withheld']],
+                    body: [[
+                        employee.income_type,
+                        employee.payment_year,
+                        employee.amount_paid.toLocaleString('th-TH', { minimumFractionDigits: 2 }),
+                        employee.tax_withheld.toLocaleString('th-TH', { minimumFractionDigits: 2 })
+                    ]],
+                    theme: 'grid',
+                    styles: { font: 'helvetica', fontSize: 10, cellPadding: 3 },
+                    headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+                    margin: { left: 15, right: 15 }
+                });
+                
+                // Total
+                const finalY = pdf.lastAutoTable.finalY + 10;
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Total Tax Withheld: ' + employee.tax_withheld.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + ' THB', 15, finalY);
+                
+                // Signature section
+                const sigY = finalY + 15;
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Authorized Signature:', 15, sigY);
+                
+                if (savedSignature) {
+                    pdf.addImage(savedSignature, 'PNG', 15, sigY + 2, 40, 15);
                 }
                 
-                document.body.removeChild(tempDiv);
+                pdf.text('(' + signerName + ')', 15, sigY + 20);
+                pdf.text('Position: ' + signerPosition, 15, sigY + 25);
+                pdf.text('Date: ' + formatThaiDate(issueDate), 15, sigY + 30);
+                
+                // Company stamp area
+                pdf.rect(140, sigY, 50, 35);
+                pdf.text('Company Stamp', 165, sigY + 18, { align: 'center' });
                 
                 // Save PDF
-                const fileName = `50Tawi_${(record['ชื่อ-นามสกุล'] || 'Unknown').replace(/\s+/g, '_')}_${record['ปีภาษี'] || '2024'}.pdf`;
-                pdf.save(fileName);
+                pdf.save('Tax_Certificate_' + employee.sequence + '_' + employee.name.replace(/\s+/g, '_') + '.pdf');
+                
+                // Delay between PDFs
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            alert('✅ สร้าง PDF เสร็จสมบูรณ์แล้ว!');
-            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('progress_text').textContent = '✅ สร้างเสร็จสมบูรณ์ทั้งหมด ' + csvData.length + ' ไฟล์!';
+            setTimeout(() => {
+                document.getElementById('progress_container').style.display = 'none';
+                document.getElementById('progress_fill').style.width = '0%';
+            }, 3000);
         }
         
-        // Auto-load saved data on page load
-        window.addEventListener('load', () => {
-            const savedCompanyData = localStorage.getItem('companyData');
-            const savedSignature = localStorage.getItem('signature');
-            
-            if (savedCompanyData) {
-                loadCompanyData();
-            }
-            
-            if (savedSignature) {
-                loadSignature();
-            }
-        });
+        function formatThaiDate(dateStr) {
+            const date = new Date(dateStr);
+            const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                          'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            return date.getDate() + ' ' + months[date.getMonth()] + ' ' + (date.getFullYear() + 543);
+        }
     </script>
 </body>
 </html>
