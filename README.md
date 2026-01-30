@@ -1,225 +1,285 @@
-# 🇹🇭 50 Tawi Tax Document Generator
-## 泰國報稅文件批次產生器
+# 🇹🇭 Thailand 50 Tawi Tax Document Generator Pro
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live-success)](https://kumakuku.github.io/50tawi-tax-document-generator/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+A professional web-based tool for batch generating Thailand tax withholding certificates (50 Tawi forms) in PDF format from CSV data files.
 
-Web-based tool for batch generating Thailand Withholding Tax Certificates (Section 50 Bis / 50 ทวิ) from CSV files.
-
-基於網頁的泰國扣繳稅款證明（50 ทวิ）批次產生工具，可從 CSV 檔案快速產生多份報稅文件。
+เครื่องมือสร้างหนังสือรับรองการหักภาษี ณ ที่จ่าย (50 Tawi) แบบอัตโนมัติในรูปแบบ PDF จากไฟล์ CSV
 
 ---
 
-## ✨ Features | 功能特點
+## ✨ Features / ฟีเจอร์หลัก
 
-✅ **Drag & Drop Upload** - 支援拖曳上傳 CSV 檔案  
-✅ **Batch Generation** - 一鍵批次產生多份文件  
-✅ **Data Preview** - 即時資料預覽（顯示前 10 筆）  
-✅ **Complete Format** - 符合泰國稅務局格式要求  
-✅ **User-Friendly Interface** - 現代化直覺介面設計  
-✅ **No Server Required** - 純前端運作，資料不上傳  
+### 📋 Core Functions
+- **✅ Batch PDF Generation** - Generate multiple tax documents at once
+- **🏢 Company Information Customization** - Save and reuse company details
+- **📊 CSV Data Import** - Drag & drop or click to upload employee data
+- **✍️ Digital Signature** - Built-in signature pad for authorized persons
+- **🎨 Professional PDF Output** - Clean, bilingual (Thai/English) format
+- **💾 Local Storage** - Save company info for future use
+
+### 🎯 Advanced Features
+- **6 Income Types Supported**:
+  1. Salary (เงินเดือน)
+  2. Bonus (โบนัส)
+  3. Overtime (ค่าล่วงเวลา)
+  4. Commission (ค่าคอมมิชชั่น)
+  5. Allowance (เบี้ยเลี้ยง)
+  6. Other Income (รายได้อื่นๆ)
+
+- **Automatic Calculations**:
+  - Total income
+  - Total deductions (Social Security + Provident Fund)
+  - Net income
+  - Tax withheld
+
+- **Data Preview** - Review uploaded data before generation
+- **Progress Tracking** - Real-time progress bar and generation log
+- **Responsive Design** - Works on desktop, tablet, and mobile
 
 ---
 
-## 🚀 Quick Start | 快速開始
+## 🚀 Quick Start / เริ่มใช้งาน
 
-### Online Demo | 線上使用
+### 1. Download and Open
+1. Download `50tawi_generator_pro.html`
+2. Open it in any modern web browser (Chrome, Firefox, Safari, Edge)
+3. No installation or server required!
 
-**直接訪問：** https://kumakuku.github.io/50tawi-tax-document-generator/
+### 2. Setup Company Information
+Go to **📋 Company Info** tab and fill in:
+- Company Name *
+- Company Tax ID *
+- Company Address *
+- Phone (optional)
+- Email (optional)
+- Authorized Person *
+- Position (optional)
+- Tax Year *
 
-### Local Usage | 本地使用
+Click **💾 Save Company Info**
 
-1. Clone this repository | 複製此專案
-```bash
-git clone https://github.com/kumakuku/50tawi-tax-document-generator.git
-cd 50tawi-tax-document-generator
+### 3. Select Income Type
+Choose the default income type for your batch (can be overridden in CSV)
+
+### 4. Upload CSV Data
+Go to **📤 Upload Data** tab:
+- Drag & drop your CSV file or click to browse
+- Review the data preview (first 10 records shown)
+- Verify total record count
+
+### 5. Add Digital Signature (Optional)
+Go to **✍️ Digital Signature** tab:
+- Sign in the signature pad using mouse or touch
+- Click **💾 Save Signature**
+- Preview will appear below
+
+### 6. Generate PDFs
+Go to **🎯 Generate Documents** tab:
+- Check the readiness checklist
+- Click **📄 Batch Generate PDF Documents**
+- Wait for progress bar to complete
+- PDFs will auto-download one by one
+
+---
+
+## 📄 CSV File Format / รูปแบบไฟล์ CSV
+
+### Required Columns / คอลัมน์ที่ต้องมี
+
+Your CSV file must include these columns:
+
+```csv
+employee_name,tax_id,personal_id,address,payment_date,income_type,amount_paid,tax_withheld,social_security,provident_fund
 ```
 
-2. Open `index.html` in your browser | 在瀏覽器中開啟 `index.html`
-```bash
-# On macOS
-open index.html
+### Column Descriptions
 
-# On Linux
-xdg-open index.html
+| Column Name | Description | Example |
+|------------|-------------|---------|
+| `employee_name` | Employee full name | Somchai Kittikul |
+| `tax_id` | Tax identification number (13 digits) | 1234567890123 |
+| `personal_id` | Personal ID number | 1-2345-67890-12-3 |
+| `address` | Employee address | 123 Sukhumvit Road Bangkok 10110 |
+| `payment_date` | Payment date | 2026-01-31 |
+| `income_type` | Income type description | 1. Salary |
+| `amount_paid` | Gross amount paid (THB) | 50000.00 |
+| `tax_withheld` | Tax withheld amount (THB) | 3500.00 |
+| `social_security` | Social security deduction (THB) | 750.00 |
+| `provident_fund` | Provident fund deduction (THB) | 2500.00 |
 
-# On Windows
-start index.html
-```
+### Sample CSV
 
-3. Upload your CSV file or use the sample data | 上傳您的 CSV 檔案或使用範例資料
-
----
-
-## 📋 CSV File Format | CSV 檔案格式
-
-Your CSV file must include the following columns (必須包含以下欄位):
-
-| Column Name | Description | 說明 | Example |
-|------------|-------------|------|---------|
-| `employee_name` | Employee name | 員工姓名 | Somchai Kittikul |
-| `tax_id` | Tax identification number | 稅務識別號碼 | 1234567890123 |
-| `personal_id` | Personal ID number | 個人身分證號 | 1-2345-67890-12-3 |
-| `address` | Address | 地址 | 123 Sukhumvit Rd Bangkok |
-| `payment_date` | Payment date | 支付日期 | 2026-01-31 |
-| `income_type` | Type of income | 收入類型 | 1. Salary |
-| `amount_paid` | Amount paid (THB) | 支付金額 | 50000.00 |
-| `tax_withheld` | Tax withheld (THB) | 扣繳稅額 | 3500.00 |
-| `social_security` | Social security (THB) | 社會保險 | 750.00 |
-| `provident_fund` | Provident fund (THB) | 公積金 | 2500.00 |
-
-### Sample CSV | 範例檔案
-
-See [`sample_data.csv`](sample_data.csv) for a complete example with 5 employees.
-
-查看 [`sample_data.csv`](sample_data.csv) 檔案，內含 5 位員工的完整範例。
+Download `50tawi_sample.csv` for a working example with 3 employees.
 
 ---
 
-## 📖 How to Use | 使用說明
+## 🖼️ Screenshots / ภาพหน้าจอ
 
-### Step 1: Prepare Your Data | 準備資料
-- Export payroll data from your system as CSV  
-  從薪資系統匯出 CSV 格式的資料
-- Ensure all required columns are present  
-  確保包含所有必要欄位
-- Use UTF-8 encoding for Thai characters  
-  使用 UTF-8 編碼以支援泰文字元
+### Company Information Setup
+![Company Info](https://via.placeholder.com/800x400?text=Company+Information+Tab)
 
-### Step 2: Upload CSV File | 上傳檔案
-- Drag and drop your CSV file to the upload area  
-  拖曳 CSV 檔案到上傳區域
-- Or click "選擇檔案" button to browse  
-  或點擊「選擇檔案」按鈕瀏覽
+### CSV Upload & Preview
+![Upload](https://via.placeholder.com/800x400?text=CSV+Upload+and+Preview)
 
-### Step 3: Review Preview | 檢查預覽
-- Check the data preview table (shows first 10 records)  
-  檢查資料預覽表格（顯示前 10 筆）
-- Verify all fields are correctly mapped  
-  確認所有欄位正確對應
+### Digital Signature
+![Signature](https://via.placeholder.com/800x400?text=Digital+Signature+Pad)
 
-### Step 4: Generate Documents | 產生文件
-- Click "🚀 批次產生 50 Tawi 文件" button  
-  點擊「🚀 批次產生 50 Tawi 文件」按鈕
-- Wait for processing (usually takes a few seconds)  
-  等待處理（通常數秒完成）
-- Documents will be automatically downloaded  
-  文件將自動下載
+### PDF Generation
+![Generate](https://via.placeholder.com/800x400?text=PDF+Generation+Progress)
 
 ---
 
-## 🎯 Income Types | 收入類型
+## 🛠️ Technical Details / รายละเอียดทางเทคนิค
 
-Common income types for 50 Tawi certificates:
+### Technologies Used
+- **HTML5** - Structure and markup
+- **CSS3** - Styling with gradients and animations
+- **Vanilla JavaScript** - Core logic (no framework dependencies)
+- **jsPDF** - PDF generation library
+- **html2canvas** - HTML to canvas conversion (for future enhancements)
+- **Signature Pad** - Digital signature capture
 
-| Code | Description (TH) | Description (EN) |
-|------|------------------|------------------|
-| 1 | เงินเดือน ค่าจ้าง | Salary, wage, pension |
-| 2 | ค่าธรรมเนียม ค่านายหน้า | Commission, fee, bonus |
-| 3 | ค่าแห่งลิขสิทธิ์ | Royalty |
-| 4 | ดอกเบี้ย | Interest |
-| 5 | เงินปันผล | Dividend |
-
----
-
-## 🛠️ Technical Details | 技術細節
-
-### Technologies Used | 使用技術
-- **Pure HTML/CSS/JavaScript** - No frameworks required  
-  純 HTML/CSS/JavaScript，無需框架
-- **Client-side Processing** - All data stays in your browser  
-  客戶端處理，資料不上傳伺服器
-- **Responsive Design** - Works on desktop and mobile  
-  響應式設計，支援桌面與行動裝置
-
-### Browser Compatibility | 瀏覽器相容性
+### Browser Compatibility
 - ✅ Chrome 90+
 - ✅ Firefox 88+
 - ✅ Safari 14+
 - ✅ Edge 90+
 
----
+### Security & Privacy
+- ✅ **100% Client-Side** - All data processing happens in your browser
+- ✅ **No Server Upload** - Your data never leaves your computer
+- ✅ **No External APIs** - Works completely offline (after first load)
+- ✅ **Local Storage Only** - Company info saved in browser storage
 
-## 📝 Output Format | 輸出格式
-
-Generated documents include:
-- Certificate number (sequential)
-- Payer and payee information
-- Income details and breakdown
-- Tax withheld amount
-- Deductions (social security, provident fund)
-- Certification section for signature and seal
-
-Currently outputs as formatted text file (.txt). For PDF generation, see [Future Enhancements](#-future-enhancements--).
+### File Size Limits
+- Maximum CSV file size: **10 MB**
+- Recommended: Less than 5,000 records per batch for optimal performance
 
 ---
 
-## 🔒 Privacy & Security | 隱私與安全
+## 📖 Usage Guide / คู่มือการใช้งาน
 
-- ✅ **100% Client-Side** - No data uploaded to servers  
-  完全於瀏覽器端處理，無資料上傳
-- ✅ **No Tracking** - No analytics or cookies  
-  無追蹤、無分析、無 Cookie
-- ✅ **Open Source** - Code is fully transparent  
-  開源專案，程式碼完全透明
+### Best Practices
+
+1. **Prepare Your Data**
+   - Ensure all employee data is accurate
+   - Use consistent date format (YYYY-MM-DD)
+   - Verify tax calculations before generating
+
+2. **Company Information**
+   - Save company info once, reuse for future batches
+   - Update tax year annually
+
+3. **Signature**
+   - Use a clear, legible signature
+   - Re-sign if signature is unclear
+   - Signature is optional but recommended
+
+4. **Batch Size**
+   - For large batches (1000+ records), consider splitting into smaller batches
+   - Close other browser tabs to improve performance
+
+### Troubleshooting
+
+**Problem: CSV upload fails**
+- Check file format is `.csv` (not `.xlsx` or `.xls`)
+- Verify column names match exactly
+- Ensure file size is under 10 MB
+
+**Problem: PDFs not downloading**
+- Check browser popup blocker settings
+- Allow multiple downloads from the page
+- Try reducing batch size
+
+**Problem: Signature not saving**
+- Ensure you draw something on the signature pad
+- Click "Save Signature" button after drawing
+- Try using a mouse instead of trackpad
+
+**Problem: Data preview shows incorrect values**
+- Check CSV encoding (should be UTF-8)
+- Verify no extra commas in address fields
+- Use quotes around fields containing commas
 
 ---
 
-## 🚧 Future Enhancements | 未來改進
+## 📝 Sample Data / ข้อมูลตัวอย่าง
 
-- [ ] PDF generation with official format
-- [ ] Digital signature support
-- [ ] Company information customization
-- [ ] Multiple income type templates
-- [ ] Bulk email sending
-- [ ] Thai language interface option
+The repository includes `50tawi_sample.csv` with 3 sample employees:
+
+1. **Somchai Kittikul** - Salary 50,000 THB
+2. **Napat Wongsakul** - Salary 65,000 THB
+3. **Pimchanok Srisawat** - Salary 45,000 THB
+
+Use this file to test the tool before using your actual employee data.
 
 ---
 
-## 🤝 Contributing | 貢獻
+## 🔄 Version History / ประวัติเวอร์ชัน
+
+### Version 1.0 Pro (Current)
+- ✅ Full PDF generation with jsPDF
+- ✅ Company information customization
+- ✅ 6 income types support
+- ✅ Digital signature pad
+- ✅ Progress tracking
+- ✅ Bilingual (Thai/English) output
+- ✅ Responsive design
+
+### Planned Features (Future)
+- [ ] Email PDF directly to employees
+- [ ] Export summary report (Excel)
+- [ ] Multi-company support
+- [ ] Template customization
+- [ ] Batch email sending
+- [ ] Integration with payroll systems
+
+---
+
+## 🤝 Contributing / การมีส่วนร่วม
 
 Contributions are welcome! Feel free to:
 - Report bugs
-- Suggest features
+- Suggest new features
 - Submit pull requests
-
-歡迎貢獻！您可以：
-- 回報錯誤
-- 建議新功能
-- 提交 Pull Request
+- Improve documentation
 
 ---
 
-## 📄 License | 授權
+## 📄 License / ลิขสิทธิ์
 
-MIT License - feel free to use this tool for your business needs.
-
-MIT 授權 - 歡迎用於您的商業需求。
+This project is open source and available under the MIT License.
 
 ---
 
-## ⚠️ Disclaimer | 免責聲明
+## ⚠️ Disclaimer / ข้อจำกัดความรับผิดชอบ
 
-This tool is provided as-is for convenience. Please verify all generated documents comply with current Thai Revenue Department regulations before submission. The authors assume no liability for errors or omissions.
+This tool is provided as-is for convenience. Users are responsible for:
+- Verifying accuracy of all tax calculations
+- Ensuring compliance with Thai tax regulations
+- Consulting with tax professionals when needed
+- Maintaining data security and privacy
 
-本工具僅供便利使用，提交前請確認所有產生的文件符合泰國稅務局最新規定。作者不對任何錯誤或遺漏負責。
+The developers assume no liability for any errors or omissions in the generated documents.
 
----
-
-## 📞 Support | 支援
-
-For questions or issues:
-- Open an [Issue](https://github.com/kumakuku/50tawi-tax-document-generator/issues)
-- Contact: maktsai2525@gmail.com
+เครื่องมือนี้จัดทำขึ้นเพื่อความสะดวก ผู้ใช้มีหน้าที่รับผิดชอบในการตรวจสอบความถูกต้องของข้อมูลและการคำนวณภาษีทั้งหมด
 
 ---
 
-<div align="center">
+## 📧 Support / การสนับสนุน
 
-**Made with ❤️ for Thai businesses**
+For questions, issues, or suggestions:
+- Open an issue on GitHub
+- Check existing issues for solutions
+- Review this README thoroughly
 
-**為泰國企業打造** 🇹🇭
+---
 
-[⬆ Back to Top](#-50-tawi-tax-document-generator)
+## 🌟 Star this Project
 
-</div>
+If you find this tool helpful, please give it a ⭐ on GitHub!
+
+---
+
+**Made with ❤️ for Thai businesses and HR professionals**
+
+**สร้างด้วยใจเพื่อธุรกิจไทยและผู้เชี่ยวชาญด้าน HR**
